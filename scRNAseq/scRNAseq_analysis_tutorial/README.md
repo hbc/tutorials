@@ -12,12 +12,13 @@ This repository contains tutorials for how to perform each part of a single-cell
 - [Clustering analysis]()
 - [Marker identification analysis]()
 
+### Analysis workflow with bcbioSingleCell [last update: 2017]
+
+- [Quality control analysis](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/02_QC_report.md)
+- [Clustering analysis](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/clustering_report_bcbioSingleCell.md)
+
 ### Downstream analyses
 - [Differential expression analysis with DESeq2]()
 - [Differential expression analysis with EdgeR]()
 - [Generating data for SPRING]()
 
-### Analysis workflow with bcbioSingleCell [last update: 2017]
-
-- [Quality control analysis](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/02_QC_report.md)
-- [Clustering analysis](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/clustering_report_bcbioSingleCell.md)
