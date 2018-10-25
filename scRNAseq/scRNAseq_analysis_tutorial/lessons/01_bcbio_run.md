@@ -32,28 +32,30 @@
 	
 	- **CCCB:** will generally provide tarballs that correspond to different runs. Sometimes they have run `bcl2fastq` on the data but you do not want to use this output. It is likely demultiplexed and cannot be used as input to `bcbio`. 
 	
-	In the run-level folder (decompress the tarball), you should see a `Samplesheet.csv` file. This is a standard file obtained from Illumina sequencing. In the file you will notice four sections (Header, Reads, Settings, Data). The `[Data]` section is what we are interested in. It should look something like:
+3. If downloaded sequencing files are BCL files, update the `Samplesheet.csv` so that it does not demultiplex.
 	
-```
-		[Data],,,,,,,,,
-Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,I5_Index_ID,index2,Sample_Project,Description
-Sample_JP1_11a_1,JP1_11a_1,,,D701,ATTACTCG,D501,AGGCTATA,JP_06092018_1641,
+	- In the run-level folder (decompress the tarball), you should see a `Samplesheet.csv` file. This is a standard file obtained from Illumina sequencing. In the file you will notice four sections (Header, Reads, Settings, Data). The `[Data]` section is what we are interested in. It should look something like:
+	
+	```
+			[Data],,,,,,,,,
+	Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,I5_Index_ID,index2,Sample_Project,Description
+	Sample_JP1_11a_1,JP1_11a_1,,,D701,ATTACTCG,D501,AGGCTATA,JP_06092018_1641,
 
-```
+	```
 		
-There are two things we need to check in this section of the CSV file:
+	There are two things we need to check in this section of the CSV file:
 
-1. The columns `I7_Index` and `I5_index` are empty.
-2. The barcode sequences that are in `index` and `index2` columns do not match sample barcodes. These can be changed to a dummy sequence like `AAAAAAAA` just to be safe.
+	1. The columns `I7_Index` and `I5_index` are empty.
+	2. The barcode sequences that are in `index` and `index2` columns do not match sample barcodes. These can be changed to a dummy sequence like `AAAAAAAA` just to be safe.
 		
-> **NOTE:** If we do not make these changes, `bcl2fastq` will attempt to demultiplex the samples. We can make changes because we don't need this samplesheet for any steps downstream other than the `bcl2fastq` step.
+	> **NOTE:** If we do not make these changes, `bcl2fastq` will attempt to demultiplex the samples. We can make changes because we don't need this samplesheet for any steps downstream other than the `bcl2fastq` step.
 
-3. If downloaded sequencing files are BCL format, then need to **convert to FASTQ**. To do this log on to O2 to run `bcl2fastq`.
+4. If downloaded sequencing files are BCL format, then need to **convert to FASTQ** after completing the changes to the `Samplesheet`. Log on to O2 to run `bcl2fastq`.
 
 	- Change directories to the sequencing folder downloaded from the facility. The folder should be arranged according to the image below for NextSeq or MiniSeq:
 	
 
-		<img src="../img/sequencing_dir_org.png" width="400">
+		<img src="../../img/sequencing_dir_org.png" width="400">
 		
 		*Image acquired from [bcl2fastq documentation](../docs/bcl2fastq2_guide_15051736_v2.pdf).* 
 		
@@ -70,10 +72,10 @@ There are two things we need to check in this section of the CSV file:
 		--minimum-trimmed-read-length 0
 		```
 		
-		More information regarding the `bcl2fastq` command and directory structures for other sequencing machines can be found in the [documentation](../docs/bcl2fastq2_guide_15051736_v2.pdf). 
+		More information regarding the `bcl2fastq` command and directory structures for other sequencing machines can be found in the [documentation](../../docs/bcl2fastq2_guide_15051736_v2.pdf). 
 		> **NOTE:** This can sometimes take awhile and is best run as a job submission script.
 		
-4. The output files should be in the `BaseCalls` directory. For each file of sequenced reads, there should be four associated FASTQ files (R1-R4) for the inDrops technology.
+5. The output files should be in the `BaseCalls` directory. For each file of sequenced reads, there should be four associated FASTQ files (R1-R4) for the inDrops technology.
 	
 	- **R1 (61 bp Read 1):** sequence of the read
 	- **R2 (8 bp Index Read 1 (i7)):** cellular barcode - which cell read originated from
@@ -87,7 +89,7 @@ There are two things we need to check in this section of the CSV file:
 	*Image credit: Sarah Boswell, Harvard Staff Scientist for Sequencing Technologies*
 
 	
-5. To quickly view the counts for the barcodes with the top five highest counts based on the first 10,000 reads in a file:
+6. To quickly view the counts for the barcodes with the top five highest counts based on the first 10,000 reads in a file:
 
 	```
 	gzip -cd filename_R3.fq.gz | head -40000 | awk 'NR % 4 == 2' | sort | uniq -c | awk 	'{ print $2 "," $1}' | sort -t"," -n --key=2 | tail -5
@@ -97,7 +99,7 @@ There are two things we need to check in this section of the CSV file:
 
 	The reverse complement sequences of the sample indices given by the client should correspond to the most abundant indices in the file.
 	
-6. Use the `cat` command to concatenate all of the files for a given sample across lanes:
+7. Use the `cat` command to concatenate all of the files for a given sample across lanes:
 
 	```
 	cat Undetermined_S0_L001_R1_001.fastq.gz Undetermined_S0_L002_R1_001.fastq.gz Undetermined_S0_L003_R1_001.fastq.gz Undetermined_S0_L004_R1_001.fastq.gz > cat_R1.fastq.gz
@@ -111,7 +113,7 @@ There are two things we need to check in this section of the CSV file:
 	
 	Do the same for the R2, R3, and R4 files.
 
-7. Create metadata file as normal for bcbio run.
+8. Create metadata file as normal for bcbio run. Note that your FASTQ files are not demultiplexed, so you will often have multiple samples in each of the FASTQ files.
 
 	```
 	fileName,description
@@ -119,7 +121,7 @@ There are two things we need to check in this section of the CSV file:
 	```
 
 
-8. Download the most recent transcriptome FASTA and GTF files:
+9. Download the most recent transcriptome FASTA and GTF files:
 
 	```
 	# Most recent mouse FASTA from Ensembl FTP
