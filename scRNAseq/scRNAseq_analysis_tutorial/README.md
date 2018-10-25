@@ -4,11 +4,11 @@ This repository contains tutorials for how to perform each part of a single-cell
 
 ## Analysis workflow with Seurat
 
-[Setting up environment to run on bcbio]()
-[Running bcbio]()
-[Clustering analysis]()
-[Marker identification analysis]()
-[Differential expression analysis with DESeq2]()
-[Differential expression analysis with EdgeR]()
-[Generating data for SPRING]()
+- [Setting up environment to run on bcbio]()
+- [Running bcbio]()
+- [Clustering analysis]()
+- [Marker identification analysis]()
+- [Differential expression analysis with DESeq2]()
+- [Differential expression analysis with EdgeR]()
+- [Generating data for SPRING]()
 
