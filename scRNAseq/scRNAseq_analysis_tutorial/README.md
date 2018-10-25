@@ -1,6 +1,6 @@
 ## Single-cell RNA-seq analysis tutorials
 
-This repository contains tutorials for how to perform each part of a single-cell analysis, from running bcbio on the raw data to performing clustering, marker identificaton and differential expression analysis with DESeq2 and EdgeR. It also contains documents for generating data to use with online exploratory tools such as SPRING.
+This repository contains tutorials for how to perform each part of a single-cell RNA-seq analysis, from running bcbio on the raw data to performing clustering, marker identificaton and differential expression analysis with DESeq2 and EdgeR. It also contains documents for generating data to use with online exploratory tools such as SPRING.
 
 ### Generating abundance estimates with bcbio
 
