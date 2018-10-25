@@ -13,7 +13,7 @@ This repository contains tutorials for how to perform each part of a single-cell
 - [Clustering analysis]()
 - [Marker identification analysis]()
 
-## Analysis workflow with bcbioSingleCell
+## Analysis workflow with bcbioSingleCell [last update: 2017]
 
 - [Quality control analysis]()
 - [Clustering analysis]()
