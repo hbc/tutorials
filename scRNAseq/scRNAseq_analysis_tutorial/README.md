@@ -4,7 +4,7 @@ This repository contains tutorials for how to perform each part of a single-cell
 
 ## Analysis workflow with Seurat
 
-- [Setting up environment to run on bcbio]()
+- [Setting up environment]()
 - [Running bcbio]()
 - [Clustering analysis]()
 - [Marker identification analysis]()
