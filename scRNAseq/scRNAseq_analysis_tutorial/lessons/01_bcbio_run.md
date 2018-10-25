@@ -155,6 +155,8 @@ The bcbio single cell RNA-Seq pipeline will perform the following steps:
 
 6. Take reads that mapped to more than one transcript and divide the count between all of the transcripts to which the reads aligned.
 
+> **NOTE:** The location of the barcodes and UMIs differs by library method, and the description given above reflects the locations for inDrop data. However, bcbio will perform similar steps for other methods; it will just parse the reads a bit differently.
+
 ## Running bcbio single cell RNA-Seq workflow on O2
 
 1. Create sample barcodes file (`.txt`) to identify samples in bcbio. The **reverse-complement of the sample barcodes supplied by the client** are written as a single barcode per line in a file. No other text should be present in the file, for example the following is the contents of a barcode file for an experiment with four samples:
