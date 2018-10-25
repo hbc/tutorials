@@ -36,12 +36,12 @@
 	
 	- In the run-level folder (decompress the tarball), you should see a `Samplesheet.csv` file. This is a standard file obtained from Illumina sequencing. In the file you will notice four sections (Header, Reads, Settings, Data). The `[Data]` section is what we are interested in. It should look something like:
 	
-	```
-			[Data],,,,,,,,,
-	Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,I5_Index_ID,index2,Sample_Project,Description
-	Sample_JP1_11a_1,JP1_11a_1,,,D701,ATTACTCG,D501,AGGCTATA,JP_06092018_1641,
+		```
+				[Data],,,,,,,,,
+		Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,I5_Index_ID,index2,Sample_Project,Description
+		Sample_JP1_11a_1,JP1_11a_1,,,D701,ATTACTCG,D501,AGGCTATA,JP_06092018_1641,
 
-	```
+		```
 		
 	There are two things we need to check in this section of the CSV file:
 
@@ -57,7 +57,7 @@
 
 		<img src="../../img/sequencing_dir_org.png" width="400">
 		
-		*Image acquired from [bcl2fastq documentation](../docs/bcl2fastq2_guide_15051736_v2.pdf).* 
+		*Image acquired from [bcl2fastq documentation](../../docs/bcl2fastq2_guide_15051736_v2.pdf).* 
 		
 		```
 		cd path/to/YYMMDD_machinename_XXXX_FCexperimentname  # cd to the folder containing the Data folder
@@ -73,6 +73,7 @@
 		```
 		
 		More information regarding the `bcl2fastq` command and directory structures for other sequencing machines can be found in the [documentation](../../docs/bcl2fastq2_guide_15051736_v2.pdf). 
+		
 		> **NOTE:** This can sometimes take awhile and is best run as a job submission script.
 		
 5. The output files should be in the `BaseCalls` directory. For each file of sequenced reads, there should be four associated FASTQ files (R1-R4) for the inDrops technology.
@@ -84,7 +85,7 @@
 
 	The reads for each sequence are depicted in the image below:
 
-	<img src="../img/sc_seq_method.png" width="800">
+	<img src="../../img/sc_seq_method.png" width="800">
 	
 	*Image credit: Sarah Boswell, Harvard Staff Scientist for Sequencing Technologies*
 
