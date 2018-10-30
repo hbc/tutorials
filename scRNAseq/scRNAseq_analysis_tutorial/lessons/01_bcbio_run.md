@@ -22,7 +22,7 @@
 		
 			The option `-r` is the number in the basespace url and the [access token](https://developer.basespace.illumina.com/docs/content/documentation/authentication/obtaining-access-tokens) is something you have to get for your basespace account. 
 		
-		The files output will be BCL files that require demultiplexing with the `bcl2fastq` tool (instructions below).
+		The files output will be BCL files that can be turned into FASTQ files with the `bcl2fastq` tool (instructions below).
 
 	- **DFCI sequencing center (Zach):** will output the FASTQ files in the correct format since the Core has provided a script to Zach.
 		
