@@ -8,9 +8,9 @@ This repository contains tutorials for how to perform each part of a single-cell
 
 ### Analysis workflow with Seurat
 
-- [Quality control analysis]()
-- [Clustering analysis]()
-- [Marker identification analysis]()
+- [Quality control analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_quality_control_analysis.html)
+- [Clustering analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_clustering_analysis.html)
+- [Marker identification analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_marker_identification.html)
 
 ### Analysis workflow with bcbioSingleCell [last update: 2017]
 
