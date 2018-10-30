@@ -33,11 +33,11 @@
 		
 		The files output will be BCL files that can be turned into FASTQ files with the `bcl2fastq` tool (instructions below).
 
-	- **DFCI sequencing center (Zach):** will output the FASTQ files in the correct format since the Core has provided a script to Zach.
+	- **DFCI sequencing center (Zach):** will output the FASTQ files in the correct format since the Core has provided a script to Zach, but should check the files - should have 4 reads, not a huge undetermined file, etc.
 		
-	- **Biopolymers sequencing facility:** will sometimes output BCL and sometimes FASTQ, so necessary to check the files - good idea to ask for the BCL files
+	- **Biopolymers sequencing facility:** should be FASTQ, but should check the files - should have 4 reads, not a huge undetermined file, etc
 		
-	- **Broad Institute:** has their own single cell distribution platform
+	- **Broad Institute:** has their own single cell distribution platform - should be FASTQ, but should check the files - should have 4 reads, not a huge undetermined file, etc
 	
 	- **CCCB:** will generally provide tarballs that correspond to different runs. Sometimes they have run `bcl2fastq` on the data but you do not want to use this output. It is likely demultiplexed and cannot be used as input to `bcbio`. 
 	
