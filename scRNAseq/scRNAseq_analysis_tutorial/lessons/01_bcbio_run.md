@@ -195,6 +195,7 @@ details:
 ```
 
 **NOTE:** If you want to perform the same barcode selection as cellranger, then you can add `auto` in `minimum_barcode_depth` parameter.
+
 **NOTE:** The `.gtf` is only used to link genes to transcripts - does not use the coordinates, so it is fine that the coordinates reference the genome.
 
 3. Normal bcbio configuration file creation:
