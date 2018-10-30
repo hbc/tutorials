@@ -33,7 +33,7 @@
 	- **CCCB:** will generally provide tarballs that correspond to different runs. Sometimes they have run `bcl2fastq` on the data but you do not want to use this output. It is likely demultiplexed and cannot be used as input to `bcbio`. 
 	
 
-4. If downloaded sequencing files are BCL format, then need to **convert to FASTQ** after completing the changes to the `Samplesheet`. Log on to O2 to run `bcl2fastq`.
+4. If downloaded sequencing files are BCL format, then need to **convert to FASTQ** after completing the changes to the `Samplesheet`.
 
 	- Change directories to the sequencing folder downloaded from the facility. The folder should be arranged according to the image below for NextSeq or MiniSeq:
 	
@@ -60,7 +60,7 @@
 		> **NOTE:** If we do not make these changes, `bcl2fastq` will attempt to demultiplex the samples. We can make changes because we don't need this samplesheet for any steps downstream other than the `bcl2fastq` step.
 
 		
-	- Load `bcl2fastq` module and convert files to FASTQ by using the following command:
+	- Log on to O2 to run `bcl2fastq`. Load `bcl2fastq` module and convert files to FASTQ by using the following command:
 		
 		```
 		bcl2fastq \
