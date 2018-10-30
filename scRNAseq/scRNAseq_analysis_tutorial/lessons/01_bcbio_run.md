@@ -10,7 +10,7 @@
 
 2. **Acquire data from sequencing core.** The way in which you handle/process your data will differ depending on the sequencing core that you obtain it from. The key thing to keep in mind is that the input to `bcbio` cannot be demultiplexed. **The data needs to remain multiplexed, but split into four FASTQ files** (R1-R4, as described in detail below).
 
-	- **Bauer sequencing core:** uses Basespace. To download the sequencing files use [BaseMount](https://help.basespace.illumina.com/articles/descriptive/introduction-to-basemount/)
+	- **Bauer sequencing core:** uses Basespace. To download the sequencing files use [BaseMount](https://help.basespace.illumina.com/articles/descriptive/introduction-to-basemount/).
 
 		- The BaseSpaceRunDownloader tool previously used and shown below is deprecated:
 	
