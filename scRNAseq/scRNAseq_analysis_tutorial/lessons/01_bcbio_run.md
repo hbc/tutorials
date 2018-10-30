@@ -1,12 +1,21 @@
 # bcbio Run
 
 ## Setting up for bcbio single cell RNA-Seq analysis
-
-1. **Ask client for the following:**
+1. **Questions during initial consult**
+	- Protocol for disassociation - how difficult?
+	- Type of method used?
+	- % viability of cells
+	- What types of cells expect to exist and a ballpark proportion expected of each
+		- If rare cell type, any method to enrich for cell type?
+	- Potential sources of variation that we might expect?
+	
+1. **Analyst should ask client for the following:**
 	- How many samples were sequenced?
 	- What were the sample indices used?
 	- How many cells were encapsulated and sequenced per sample?
 	- What is the main experimental question - does it require clustering using markers and/or cell trajectory analyses?
+	- Handful of markers
+
 
 2. **Acquire data from sequencing core.** The way in which you handle/process your data will differ depending on the sequencing core that you obtain it from. The key thing to keep in mind is that the input to `bcbio` cannot be demultiplexed. **The data needs to remain multiplexed, but split into four FASTQ files** (R1-R4, as described in detail below).
 
