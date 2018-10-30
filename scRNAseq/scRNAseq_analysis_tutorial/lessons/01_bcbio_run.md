@@ -43,7 +43,7 @@
 		*Image acquired from [bcl2fastq documentation](../../docs/bcl2fastq2_guide_15051736_v2.pdf).* 
 		
 		```
-		cd path/to/YYMMDD_machinename_XXXX_FCexperimentname  # cd to the folder containing the Data folder
+		cd path/to/YYMMDD_machinename_XXXX_FCexperimentname 
 		```
 	- Update the `Samplesheet.csv` so that it does not demultiplex.
 		- In the run-level folder (decompress the tarball), you should see a `Samplesheet.csv` file. This is a standard file obtained from Illumina sequencing. In the file you will notice four sections (Header, Reads, Settings, Data). The `[Data]` section is what we are interested in. It should look something like:
@@ -62,7 +62,7 @@
 		
 	- Log on to O2 to run `bcl2fastq`. Load `bcl2fastq` module and convert files to FASTQ by using the following command:
 		
-		```
+		``` 
 		bcl2fastq \
 		--use-bases-mask y*,y*,y*,y* \
 		--mask-short-adapter-reads 0 \
