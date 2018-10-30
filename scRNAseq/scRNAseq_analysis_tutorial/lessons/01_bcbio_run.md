@@ -32,23 +32,6 @@
 	
 	- **CCCB:** will generally provide tarballs that correspond to different runs. Sometimes they have run `bcl2fastq` on the data but you do not want to use this output. It is likely demultiplexed and cannot be used as input to `bcbio`. 
 	
-3. If downloaded sequencing files are BCL files, update the `Samplesheet.csv` so that it does not demultiplex.
-	
-	- In the run-level folder (decompress the tarball), you should see a `Samplesheet.csv` file. This is a standard file obtained from Illumina sequencing. In the file you will notice four sections (Header, Reads, Settings, Data). The `[Data]` section is what we are interested in. It should look something like:
-	
-		```
-				[Data],,,,,,,,,
-		Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,I5_Index_ID,index2,Sample_Project,Description
-		Sample_JP1_11a_1,JP1_11a_1,,,D701,ATTACTCG,D501,AGGCTATA,JP_06092018_1641,
-
-		```
-		
-	There are two things we need to check in this section of the CSV file:
-
-	1. The columns `I7_Index` and `I5_index` are empty.
-	2. The barcode sequences that are in `index` and `index2` columns do not match sample barcodes. These can be changed to a dummy sequence like `AAAAAAAA` just to be safe.
-		
-	> **NOTE:** If we do not make these changes, `bcl2fastq` will attempt to demultiplex the samples. We can make changes because we don't need this samplesheet for any steps downstream other than the `bcl2fastq` step.
 
 4. If downloaded sequencing files are BCL format, then need to **convert to FASTQ** after completing the changes to the `Samplesheet`. Log on to O2 to run `bcl2fastq`.
 
@@ -62,6 +45,20 @@
 		```
 		cd path/to/YYMMDD_machinename_XXXX_FCexperimentname  # cd to the folder containing the Data folder
 		```
+	- Update the `Samplesheet.csv` so that it does not demultiplex.
+		- In the run-level folder (decompress the tarball), you should see a `Samplesheet.csv` file. This is a standard file obtained from Illumina sequencing. In the file you will notice four sections (Header, Reads, Settings, Data). The `[Data]` section is what we are interested in. It should look something like:
+	
+			```
+					[Data],,,,,,,,,
+			Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,I5_Index_ID,index2,Sample_Project,Description
+			Sample_JP1_11a_1,JP1_11a_1,,,D701,ATTACTCG,D501,AGGCTATA,JP_06092018_1641,
+
+			```
+	There are two things we need to check in this section of the CSV file:
+		1. The columns `I7_Index` and `I5_index` are empty.
+		2. The barcode sequences that are in `index` and `index2` columns do not match sample barcodes. These can be changed to a dummy sequence like `AAAAAAAA` just to be safe.
+		> **NOTE:** If we do not make these changes, `bcl2fastq` will attempt to demultiplex the samples. We can make changes because we don't need this samplesheet for any steps downstream other than the `bcl2fastq` step.
+
 		
 	- Load `bcl2fastq` module and convert files to FASTQ by using the following command:
 		
