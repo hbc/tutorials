@@ -1,0 +1,347 @@
+---
+title: "Quality Control"
+author: 
+date: "`r Sys.Date()`"
+bibliography: bibliography.bib
+output: html_document
+---
+
+```{r setup, cache=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load libraries
+library(Seurat)
+library(knitr)
+library(rmarkdown)
+library(tidyverse)
+library(Matrix)
+library(AnnotationHub)
+library(ensembldb)
+library(scales)
+
+# Set seed for reproducibility
+set.seed(1454944673L)
+
+opts_chunk[["set"]](
+    audodep = TRUE,
+    cache = TRUE,
+    cache.lazy = FALSE,
+    error = TRUE,
+    echo = FALSE,
+    fig.height = 10L,
+    fig.retina = 2L,
+    fig.width = 10L,
+    message = FALSE,
+    tidy = TRUE,
+    warning = TRUE
+)
+
+theme_set(
+    theme_paperwhite(
+        base_size = 14L,
+        legend_position = "bottom"
+    )
+)
+```
+
+# Overview
+
+- Principal Investigator / Researcher: 
+- Experiment: 
+
+Experimental description:
+
+Goals:
+
+Expectations: 
+
+- Reads per cell:
+- Cells per sample:
+- Cell type populations:
+
+* * *
+
+
+
+```{r raw_data}
+# Bring in count matrix from bcbio
+raw_counts <- readMM("path/to/tagcounts.mtx")
+
+# Assign row names and column names of matrix
+gene_names <- read.csv("path/to/tagcounts.mtx.rownames", header = FALSE)
+cell_ids <- read.csv("path/to/tagcounts.mtx.colnames", header = FALSE)
+rownames(raw_counts) <- gene_names[, 1]
+colnames(raw_counts) <- cell_ids[, 1]
+
+# Acquire the gene names for the Ensembl IDs
+## Connect to AnnotationHub
+ah <- AnnotationHub()
+
+## Access the Ensembl database for organism
+ahDb <- query(ah, 
+              pattern = c("Homo sapiens", "EnsDb"), 
+              ignore.case = TRUE)
+
+## Acquire the latest annotation files
+id <- ahDb %>%
+        mcols() %>%
+        rownames() %>%
+        tail(n = 1)
+
+## Download the appropriate Ensembldb database
+edb <- ah[[id]]
+
+## Extract gene-level information from database
+annotations <- genes(edb, 
+                     return.type = "data.frame")
+
+## Select annotations of interest
+annotations <- annotations %>%
+        dplyr::select(gene_id, gene_name, seq_name, gene_biotype, description)
+
+# Getting gene names in place of Ensembl IDs as row IDs
+gene_symbols <- merge(raw_counts[, 1], annotations, by.x = 0, by.y = "gene_id")
+
+gene_symbols <- gene_symbols[, -c(2)]
+
+duplicated_ids <- which(duplicated(gene_symbols$gene_name))
+# length(duplicated_ids)
+
+raw_counts <- raw_counts[-c(duplicated_ids), ]
+
+gene_symbols <- gene_symbols[-c(duplicated_ids), ]
+
+rownames(raw_counts) <- gene_symbols$gene_name
+
+#write.csv(as.matrix(raw_counts), "data/raw_counts_symbols.csv")
+#write(gene_symbols$gene_name, "data/gene_names.txt")
+#write(colnames(raw_counts), "data/cell_ids.txt")
+
+# Create a sparse matrix for more efficient computation
+counts <- as(raw_counts, "dgCMatrix")
+
+# Format cells properly
+colnames(counts) <- str_replace_all(colnames(counts), "-", "_")
+colnames(counts) <- str_replace_all(colnames(counts), ":", "_")
+
+# Create metadata containing only the cell IDs
+metadata <- data.frame(row.names = colnames(counts), cells = colnames(counts), stringsAsFactors = F)
+
+# Add number of UMIs for each gene per cell to metadata
+metadata$nUMI <- Matrix::colSums(counts)
+
+# Add number of genes detected per cell to metadata
+metadata$nGene <- Matrix::colSums(counts > 0)
+
+# Add number of UMIs per gene for each cell to metadata
+metadata$log10GenesPerUMI <- log10(metadata$nGene) / log10(metadata$nUMI)
+
+# Add sample name
+CD45_0325 <- which(str_detect(metadata$cells, "run1_ATAGAGAG"))
+CD45_CD14_0425 <- which(str_detect(metadata$cells, "run1_ATTAGACG"))
+CD45_CD14_0325 <- which(str_detect(metadata$cells, "run1_CTCCTTAC"))
+CD45_0425 <- which(str_detect(metadata$cells, "run1_TACTCCTT"))
+
+metadata$sample <- "x"
+metadata$sample[CD45_0325] <- "CD45_0325"
+metadata$sample[CD45_CD14_0425] <- "CD45_CD14_0425"
+metadata$sample[CD45_CD14_0325] <- "CD45_CD14_0325"
+metadata$sample[CD45_0425] <- "CD45_0425"
+#which(metadata$sample == "x")
+
+# Get the total number of reads per sample
+nReads_CD45_0325 <- read_tsv("path/to/final/run1-ATAGAGAG/run1-ATAGAGAG-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
+        mutate(cell = make.names(cell)) %>%
+        mutate(sample = "CD45_0325")
+
+nReads_CD45_CD14_0425 <- read_tsv("path/to/final/run1-ATTAGACG/run1-ATTAGACG-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
+        mutate(cell = make.names(cell)) %>%
+        mutate(sample = "CD45_CD14_0425")
+
+nReads_CD45_CD14_0325 <- read_tsv("path/to/final/run1-CTCCTTAC/run1-CTCCTTAC-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
+        mutate(cell = make.names(cell)) %>%
+        mutate(sample = "CD45_CD14_0325")
+
+
+nReads_CD45_0425 <- read_tsv("path/to/final/run1-TACTCCTT/run1-TACTCCTT-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
+        mutate(cell = make.names(cell)) %>%
+        mutate(sample = "CD45_0425")
+
+nReads <- rbind(nReads_CD45_0325, nReads_CD45_CD14_0425, nReads_CD45_CD14_0325, nReads_CD45_0425)
+
+nReads$nReads <- log10(nReads$nReads)
+```
+
+# Quality control metrics
+
+## Reads per cell {.tabset}
+
+These are counts of how many reads are assigned to a given cellular barcode. It is normal for single cell RNA-seq data to contain a large number of low complexity barcodes. The bcbio pipeline filters out most of these barcodes, and here we have applied a threshold cutoff of a minimum of 1000 reads per cell. The unfiltered read count distributions are shown here.
+
+The plot shows the frequency distribution of the reads per cell. You can see that the vast majority of low complexity barcodes plateau at a read depth below 1000 reads per cell. This is to be expected and we will remove these by filtering these low quality "cells".
+
+```{r reads_per_cell}
+# Number of reads per cell
+nReads %>% 
+        ggplot(aes(color=sample, x=nReads, fill= sample,  )) + 
+        geom_density(alpha = 0.2) +
+        xlab("log10 reads per cell") +
+        geom_vline(xintercept = 3)
+
+# Extract IDs for mitochondrial genes
+mt <- annotations %>% 
+        dplyr::filter(seq_name == "MT") %>%
+        dplyr::pull(gene_name)
+
+# Number of UMIs assigned to mitochondrial genes
+metadata$mtUMI <- Matrix::colSums(counts[which(rownames(counts) %in% mt),], na.rm = T)
+
+# Ensure all NAs receive zero counts
+metadata$mtUMI[is.na(metadata$mtUMI)] <- 0
+
+# Calculate of mitoRatio per cell
+metadata$mitoRatio <- metadata$mtUMI/metadata$nUMI
+
+# Keep cells with nUMI greater than 100
+idx <- which(metadata$nUMI > 100)
+
+# Extract the counts for those cells
+counts_c <- counts[, idx]
+
+
+# Extract the metadata for those cells
+metadata_c <- metadata[idx,]
+
+# Save data to single cell experiment variable
+se <- SingleCellExperiment(assays=list(counts=counts_c), 
+                           colData = metadata_c)
+
+# Create a data frame containing the metrics for visualizations
+metrics <- colData(se) %>%
+        as.data.frame
+```
+
+
+We expect to have 3,000 cells sequenced per sample, so we can explore the UMI counts per sample. After removing cells based on quality metrics, we expect to have ~3,000 counts per sample.
+
+```{r counts_per_sample}
+# Visualize the number of counts per sample
+metrics %>% 
+        ggplot(aes(x=sample, fill=sample)) + 
+        geom_bar() + 
+        theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+        ggtitle("NCells")
+```
+
+## UMI counts per cell
+
+Now let's assess the distribution of unique molecular identifier (UMI)-deconvoluted counts per cell. In general, the distributions should be relatively uniform per sample.
+
+```{r UMIs_per_cell}
+# Visualize the number UMIs/transcripts per cell
+metrics %>% 
+        ggplot(aes(color=sample, x=nUMI, fill= sample)) + 
+        geom_density(alpha = 0.2) + 
+        scale_x_log10() + 
+        ylab("log10 cell density") +
+        geom_vline(xintercept = 500)
+```
+
+## Genes detected per cell
+
+Here by "detected", we mean genes with a non-zero count measurement per cell. Seeing gene detection in the range of `500`-`5000` is normal for most single-cell experiments.
+
+```{r genes_detected}
+# Visualize the distribution of genes detected per cell via histogram
+metrics %>% 
+        ggplot(aes(color=sample, x=nGene, fill= sample)) + 
+        geom_density(alpha = 0.2) + 
+        scale_x_log10() + 
+        geom_vline(xintercept = 300)
+
+# Visualize the distribution of genes detected per cell via boxplot
+metrics %>% 
+        ggplot(aes(x=sample, y=log10(nGene), fill=sample)) + 
+        geom_boxplot() + 
+        theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+        ggtitle("NCells vs NGenes")
+```
+
+## UMIs vs. genes detected
+
+If we graph out the total number of UMI counts per cell vs. the genes detected per cell, we can assess whether there is a large population of low quality cells with low counts and/or gene detection.
+
+```{r umis_vs_genes}
+# Visualize the correlation between genes detected and number of UMIs and determine whether strong presence of cells with low numbers of genes/UMIs
+metrics %>% 
+        ggplot(aes(x=nUMI, y=nGene, color=mitoRatio)) + 
+        geom_point() + 
+        stat_smooth(method=lm) +
+        scale_x_log10() + 
+        scale_y_log10() + 
+        geom_vline(xintercept = 800) +
+        facet_wrap(~sample)
+```
+
+## Mitochondrial abundance {.tabset}
+
+We evaluate overall mitochondrial gene expression as a biomarker of cellular stress during sample preparation. 
+
+```{r mito_ratios}
+# Visualize the distribution of mitochondrial gene expression detected per cell
+metrics %>% 
+        ggplot(aes(color=sample, x=mitoRatio, fill=sample)) + 
+        geom_density(alpha = 0.2) + 
+        scale_x_log10() + 
+        geom_vline(xintercept = 0.25)
+```
+
+## Novelty {.tabset}
+
+Another way to QC the data is to look for less novelty, that is cells that have less genes detected per count than other cells. We can see the samples where we sequenced each cell less have a higher overall novelty, that is because we have not started saturated the sequencing for any given gene for these samples. Outlier cells in these samples might be cells that we have a less complex RNA species than other cells. Sometimes we can detect contamination with low complexity cell types like red blood cells via this metric.
+
+```{r novelty}
+# Visualize the overall novelty of the gene expression by visualizing the genes detected per UMI
+metrics %>%
+        ggplot(aes(x=log10GenesPerUMI, color = sample, fill=sample)) +
+        geom_density(alpha = 0.2)
+```
+
+
+# Filter cells
+
+Based on the above metrics we can filter the cells using the discussed thresholds. We will also filter out those genes that do not have counts in at least 10 cells.
+
+```{r filtering}
+# Filter out low quality cells using selected thresholds - these will change with experiment
+keep_cells <- metrics %>%
+        dplyr::filter(nUMI >= 1300 , 
+                      nGene >= 500,
+                      log10GenesPerUMI >= 0.85,
+                      mitoRatio <= 0.25,
+        ) %>% 
+        pull(cells)
+
+# Subset the cells to only include those cells and genes that meet the thresholds specified
+se_c <- se[, keep_cells]
+
+# Output a logical vector for every gene on whether the more than zero counts per cell
+nonzero <- counts(se_c) > 0L
+
+# Sums all TRUE values and returns TRUE if more than 10 TRUE values per gene
+keep_genes <- rowSums(as.matrix(nonzero)) >= 10
+
+# Only keeping those genes expressed in more than 10 cells
+se_c <- se_c[keep_genes, ]
+
+# Save subset to new metrics variable
+metrics_clean <- colData(se_c) %>%
+ as.data.frame()
+
+# Save cleaned single-cell experimnet as .RData to load at any time
+saveRDS(se_c, file = "data/se_filtered.rds")
+
+# The following can be used for SPRING interface
+#write.csv(as.matrix(counts(se_c)), "data/tseng_filtered_counts_baseR.csv")
+#write(rownames(counts(se_c)), "data/tseng_filtered_gene_names.csv")
+#write(colnames(counts(se_c)), "data/tseng_filtered_cell_ids.csv")
