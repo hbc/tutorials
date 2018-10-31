@@ -352,7 +352,7 @@ saveRDS(se_c, file = "data/se_filtered.rds")
 seurat_raw <- CreateSeuratObject(raw.data = counts(se_c),
                                  meta.data = colData(se_c) %>% 
                                          data.frame())
-saveRDS(seurat_raw, file = file.path(data_dir,"raw_seurat.rds"))
+saveRDS(seurat_raw, file = file.path(data_dir,"seurat_raw.rds"))
 
 # Download cell cycle genes for organism at https://github.com/hbc/tinyatlas/tree/master/cell_cycle. Read it in with:
 cell_cycle_genes <- read.csv("path/to/organism.csv")
@@ -367,5 +367,5 @@ g2m_genes <- cell_cycle_markers %>%
         pull("gene_name")
 save(g2m_genes, s_genes, file = file.path("data/cycle.rda"))
 
-# Copy cycle.rda and raw_seurat.rds to O2 if not already there to perform clustering. I modify scripts available at: 
+# Copy cycle.rda and seurat_raw.rds to O2 if not already there to perform clustering. I perform clustering on O2 using: https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/clustering_pre_regress.R, followed by https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/clustering_regress.R.
 ```
