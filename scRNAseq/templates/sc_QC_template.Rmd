@@ -345,3 +345,24 @@ saveRDS(se_c, file = "data/se_filtered.rds")
 #write.csv(as.matrix(counts(se_c)), "data/tseng_filtered_counts_baseR.csv")
 #write(rownames(counts(se_c)), "data/tseng_filtered_gene_names.csv")
 #write(colnames(counts(se_c)), "data/tseng_filtered_cell_ids.csv")
+```
+
+```{r setting_up_for_clustering}
+# Create Seurat object from filtered SingleCellExperiment object
+seurat_raw <- CreateSeuratObject(raw.data = counts(se_c),
+                                 meta.data = colData(se_c) %>% 
+                                         data.frame())
+
+# Download cell cycle genes for organism at https://github.com/hbc/tinyatlas/tree/master/cell_cycle. Read it in with:
+cell_cycle_genes <- read.csv("path/to/organism.csv")
+
+cell_cycle_markers <- dplyr::left_join(cell_cycle_genes, annotations, by = c("geneID" = "gene_id"))
+
+s_genes <- cell_cycle_markers %>%
+        dplyr::filter(phase == "S") %>%
+        pull("gene_name")
+g2m_genes <- cell_cycle_markers %>%
+        dplyr::filter(phase == "G2/M") %>%
+        pull("gene_name")
+save(g2m_genes, s_genes, file = file.path("data/cycle.rda"))
+```
