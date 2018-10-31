@@ -174,7 +174,7 @@ nReads$nReads <- log10(nReads$nReads)
 
 # Quality control metrics
 
-## Reads per cell {.tabset}
+## Reads per cell
 
 These are counts of how many reads are assigned to a given cellular barcode. It is normal for single cell RNA-seq data to contain a large number of low complexity barcodes. The bcbio pipeline filters out most of these barcodes, and here we have applied a threshold cutoff of a minimum of 1000 reads per cell. The unfiltered read count distributions are shown here.
 
@@ -283,7 +283,7 @@ metrics %>%
         facet_wrap(~sample)
 ```
 
-## Mitochondrial abundance {.tabset}
+## Mitochondrial abundance
 
 We evaluate overall mitochondrial gene expression as a biomarker of cellular stress during sample preparation. 
 
@@ -296,7 +296,7 @@ metrics %>%
         geom_vline(xintercept = 0.25)
 ```
 
-## Novelty {.tabset}
+## Novelty
 
 Another way to QC the data is to look for less novelty, that is cells that have less genes detected per count than other cells. We can see the samples where we sequenced each cell less have a higher overall novelty, that is because we have not started saturated the sequencing for any given gene for these samples. Outlier cells in these samples might be cells that we have a less complex RNA species than other cells. Sometimes we can detect contamination with low complexity cell types like red blood cells via this metric.
 
