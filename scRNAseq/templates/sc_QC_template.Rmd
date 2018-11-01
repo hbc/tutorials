@@ -369,5 +369,5 @@ save(g2m_genes, s_genes, file = file.path("data/cycle.rda"))
 
 # Copy cycle.rda and seurat_raw.rds to O2 if not already there to perform clustering. 
 # I perform clustering on O2 using: https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/clustering_pre_regress.R
-# Next I run https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/clustering_regress.R.
+# Next, on O2 I run https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/clustering_regress.R.
 ```
