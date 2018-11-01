@@ -1,0 +1,424 @@
+---
+title: "scRNA-seq: cell clustering"
+author: 
+date: "`r Sys.Date()`"
+bibliography: bibliography.bib
+output: html_document
+---
+
+```{r setup, cache=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load libraries
+library(Seurat)
+library(knitr)
+library(rmarkdown)
+library(tidyverse)
+library(Matrix)
+library(AnnotationHub)
+library(ensembldb)
+library(scales)
+
+# Set seed for reproducibility
+set.seed(1454944673L)
+
+opts_chunk[["set"]](
+    audodep = TRUE,
+    cache = TRUE,
+    cache.lazy = FALSE,
+    error = TRUE,
+    echo = FALSE,
+    fig.height = 10L,
+    fig.retina = 2L,
+    fig.width = 10L,
+    message = FALSE,
+    tidy = TRUE,
+    warning = TRUE
+)
+
+theme_set(
+    theme_paperwhite(
+        base_size = 14L,
+        legend_position = "bottom"
+    )
+)
+```
+
+# Overview
+
+- Principal Investigator / Researcher: 
+- Experiment: 
+
+Experimental description:
+
+Goals:
+
+Expectations: 
+
+- Reads per cell:
+- Cells per sample:
+- Cell type populations:
+
+* * *
+
+This workflow is adapted from the following sources:
+
+- Satija Lab: [Seurat v2 Guided Clustering Tutorial](http://satijalab.org/seurat/pbmc3k_tutorial.html)
+- Paul Hoffman: [Cell-Cycle Scoring and Regression](http://satijalab.org/seurat/cell_cycle_vignette.html)
+
+To identify clusters, the following steps will be performed:
+
+1. Normalization and transformation of the raw gene counts per cell to account for differences in sequencing depth.
+2. Identification of high variance genes.
+3. Regression of sources of unwanted variation (e.g. number of UMIs per cell, mitochondrial transcript abundance, cell cycle phase).
+4. Identification of the primary sources of heterogeneity using principal component (PC) analysis and heatmaps.
+5. Clustering cells based on significant PCs (metagenes).
+
+* * *
+
+# Clustering report 
+
+In this report, we are exploring the clustering of cells by similarities in gene expression.
+
+```{r data, message=FALSE, warning=FALSE}
+# Use script () on O2 to generate the cell clusters and save to an .rds file
+
+pre_regressed_seurat <- readRDS("path/to/data/pre_regressed_seurat.rds") 
+
+seurat <- readRDS("path/to/data/seurat_tsne.rds") # path on O2 - usually copy to local computer
+
+```
+
+## Normalizing counts, finding variable genes, and scaling the data
+
+The raw counts for the sample are normalized using global-scaling normalization, which normalizes each cell by total expression and applies a log transformation. Then, the most variable genes are identified after calculation of the gene-wise dispersions.
+
+We can plot dispersion (a normalized measure of to cell-to-cell variation) as a function of average expression for each gene to identify a set of high-variance genes, which are used to determine the principal components. 
+
+```{r dispersion}
+# Plot variable genes
+VariableGenePlot(pre_regressed_seurat)
+```
+
+## Cell cycle expression
+
+We can check if our cell cycle is a major source of variation in our data by visualizing a PCA plot and coloring by cell cycle phase of each cell.
+
+```{r preregressed_cell_cycle}
+# PCA by cell cycle of pre-regressed seurat
+PCAPlot(pre_regressed_seurat, group.by= "Phase")
+```
+
+## Apply regression variables
+
+To explore the clustering of all of the samples together, we regressed out variation due to read count depth, cell cycle, and mitochondrial content. 
+
+Now that regression has been applied, we should see the phase clusters superimpose by PCA.
+
+```{r cell_cycle_pca}
+# PCA plot after regression
+PCAPlot(seurat, group.by= "Phase")
+```
+
+## Linear dimensionality reduction and determining significant prinicipal components
+
+Next, we perform scoring of each gene in the dataset based on correlation with the calculated principal components. 
+
+Then, to overcome the extensive technical noise in any single gene for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a “metagene” that combines information across a correlated gene set. Determining how many PCs to include downstream is therefore an important step. Often it is useful to explore the PCs prior to identifying the significant principal components to include for the downstream clustering analysis.
+
+We can print out the top most variant genes for the select PCs. Here we are identifying the five most positively and negatively variant genes for the top 10 PCs:
+
+```{r exploring_pcs_list}
+## Genes associated with principal components
+PrintPCA(object = seurat, 
+         pcs.print = 1:10, 
+         genes.print = 5, 
+         use.full = FALSE)
+```
+
+We can also explore the expression of the top most variant genes for select PCs. The genes and cells are ordered by PC scores:
+
+```{r exploring_pcs_heatmap}
+# Explore expression of most extreme genes per PC
+PCHeatmap(object = seurat, 
+          pc.use = 1:10, 
+          cells.use = 500, 
+          do.balanced = TRUE, 
+          label.columns = FALSE, 
+          use.full = FALSE)
+```
+
+PC selection — identifying the true dimensionality of a dataset — is an important step for our clustering analysis, but can be challenging/uncertain. While there are a variety of ways to choose a threshold, we’re going to calculate where the principal components start to elbow by taking the larger value of:
+
+1. The point where the principal components only contribute 5% of standard deviation (bottom left).
+2. The point where the principal components cumulatively contribute 90% of the standard deviation (bottom right).
+
+
+```{r elbow_plot}
+# Create elbow plot
+PCElbowPlot(seurat)
+
+# Determine the estimate for significant PCs
+
+pct <- seurat@dr$pca@sdev / sum(seurat@dr$pca@sdev) * 100
+cumu <- cumsum(pct)
+co1 <- which(cumu > 90 & pct < 5)[1]
+co2 <- sort(which((pct[1:length(pct)-1] - pct[2:length(pct)]) > 0.1),
+          decreasing = T)[1] + 1 # last point where change of % of variation is more than 0.1%.
+pcs <- min(co1, co2) # change to any other number
+```
+
+## Cluster the cells
+
+We can now use these significant PCs to determine which cells exhibit similar expression patterns for clustering. To do this, Seurat uses a graph-based clustering approach, which embeds cells in a graph structure, using a K-nearest neighbor (KNN) graph (by default), with edges drawn between cells with similar gene expression patterns. Then, it attempts to partition this graph into highly interconnected ‘quasi-cliques’ or ‘communities’. Details on this clustering methods are available in the Seurat paper. 
+
+To cluster cells we used a `resolution` argument that sets the "granularity" of the downstream clustering, with increased values leading to a greater number of clusters. We used a resolution of X for this analysis. 
+
+A useful feature in [Seurat][] is the ability to recall the parameters that were used in the analysis. Important are the resolution used for clustering and the number of principal components (dimensions) used for the calcuations if repeating. We have provided these below.
+
+```{r parameters}
+# Choose a resolution and set identity
+seurat <- SetAllIdent(object = seurat, id = "res.0.8")
+
+PrintFindClustersParams(seurat, resolution = 0.8)
+
+seurat <- RunTSNE(
+  seurat,
+  dims.use = 1:pcs,
+  do.fast = TRUE)
+
+# TSNEPlot(object = seurat)
+```
+
+### t-SNE
+
+Seurat continues to use t-distributed stochastic neighbor embedding (t-SNE) as a powerful tool to visualize and explore these datasets. Generally, t-SNE aims to place cells with similar local neighborhoods in high-dimensional space together in low-dimensional space. We will use the selected prinicipal components to aid in clustering of cells with similar gene expression together. **Note that distance between clusters on the t-SNE plots does not represent degree of similarity between clusters.**
+
+```{r tsne, results="asis"}
+# Choose a resolution
+seurat <- SetAllIdent(object = seurat, id = "res.0.8")
+
+# Run the TSNE to determine the clusters
+seurat <- RunTSNE(
+  seurat,
+  dims.use = 1:pcs,
+  do.fast = TRUE)
+
+# Plot the TSNE
+DimPlot(seurat,
+        "tsne",
+        do.label = TRUE,
+        do.return = TRUE,
+        label.size = 6,
+        plot.title = "tSNE") 
+```
+
+
+### PCA
+
+Note that t-SNE is not PCA! The measurement of distance in a t-SNE plot is difficult to interpret, and is most helpful for the relationships of close neighbors. To better infer separation distance between the putative clusters, let's visualize using PCA.
+
+```{r pca, results="asis"}
+# Plot the PCA
+DimPlot(seurat,
+        "pca",
+        do.label = TRUE,
+        do.return = TRUE,
+        label.size = 6,
+        plot.title = "PCA")
+```
+
+
+## Cluster quality control
+
+Exploration of quality control metrics
+To determine whether our clusters might be due to artifacts such as cell cycle phase or mitochondrial expression, it can be useful to explore these metrics visually to see if any clusters exhibit enrichment or are different from the other clusters. However, if enrichment or differences are observed for particular clusters it may not be worrisome if it can be explained by the cell type. 
+
+We can start by exploring the distribution of cells per cluster for each sample:
+
+```{r cell_counts}
+# Extract identity and sample information from seurat object to determine the number of cells per cluster per sample
+n_cells <- FetchData(seurat, vars.all = c("ident", "sample")) %>% 
+  dplyr::count(sample, ident) %>% 
+  spread(ident, n)
+
+# View table
+knitr::kable(n_cells)
+```
+
+Then, we can acquire the different cluster QC metrics. We will explore sample and cell cycle to view by tSNE and PCA:
+
+```{r plot_feature_tsne}
+# Establishing groups to color plots by
+group_by <- c("Phase", "sample")
+
+# Getting coordinates for cells to use for tSNE and associated grouping variable information
+class_tsne_data <- FetchData(seurat, vars.all = c("ident", "tSNE_1", "tSNE_2", group_by))
+
+# Adding cluster label to center of cluster on tSNE
+tsne_label <- FetchData(seurat, 
+                        vars.all = c("ident", "tSNE_1", "tSNE_2"))  %>% 
+  as.data.frame() %>% 
+  group_by(ident) %>%
+  summarise(x=mean(tSNE_1), y=mean(tSNE_2))
+
+# Getting coordinates for cells to use for PCA and associated grouping variable information
+class_pca_data <- FetchData(seurat, vars.all = c("ident", "PC1", "PC2", group_by))
+
+# Adding cluster label to center of cluster on PCA
+pca_label <- FetchData(seurat, vars.all = c("ident", "PC1", "PC2"))  %>% 
+  as.data.frame() %>% 
+  mutate(ident = seurat@ident) %>% 
+  group_by(ident) %>%
+  summarise(x=mean(PC1), y=mean(PC2))
+
+# Function to plot tSNE and PCA as grids
+map(group_by, function(metric) {
+  cat("\n\n###", metric, "\n\n")
+  p <- plot_grid(
+    ggplot(class_tsne_data, aes(tSNE_1, tSNE_2)) +
+      geom_point(aes_string(color = metric), alpha = 0.7) +
+      scale_color_brewer(palette = "Set2")  +
+      geom_text(data=tsne_label, aes(label=ident, x, y)),
+    ggplot(class_pca_data, aes(PC1, PC2)) +
+      geom_point(aes_string(color = metric), alpha = 0.7) +
+      scale_color_brewer(palette = "Set2")  +
+      geom_text(data=pca_label, aes(label=ident, x, y)),
+    nrow = 1, align = "v"
+  ) 
+  print(p)
+}) %>% invisible()
+
+```
+
+Next we will explore additional metrics, such as the number of UMIs and genes per cell, S-phase and G2M-phase markers, and mitochondrial gene expression by tSNE:
+
+```{r dim_features}
+# Determine metrics to plot present in seurat@meta.data
+metrics <-  c("nUMI", "nGene", "S.Score", "G2M.Score", "mitoRatio")
+
+# Extract the TSNE coordinates for each cell and include information about the metrics to plot
+qc_data <- FetchData(seurat, vars.all = c(metrics, "ident", "tSNE_1", "tSNE_2"))
+
+# Plot a tSNE plot for each metric
+map(metrics, function(qc){
+  ggplot(qc_data, aes(tSNE_1, tSNE_2)) +
+    geom_point(aes_string(color=qc), alpha = 0.7) +
+    scale_color_gradient(guide = FALSE, low = "grey90", high = "blue")  +
+    geom_text(data=tsne_label, aes(label=ident, x, y)) +
+    ggtitle(qc)
+}) %>% 
+  plot_grid(plotlist = .)
+```
+
+We can also explore how well our clusters separate by the different PCs; we hope that the defined PCs separate the cell types well. In the tSNE plots below, the cells are colored by their PC score for each respective principal component.
+
+```{r feature_pcs}
+# Defining the information in the seurat object of interest
+columns <- c(paste0("PC", 1:pcs),
+            "ident",
+            "tSNE_1", "tSNE_2")
+
+# Extracting this data from the seurat object
+pc_data <- FetchData(seurat, vars.all = columns)
+
+# Plotting a tSNE plot for each of the PCs
+map(paste0("PC", 1:pcs), function(pc){
+  ggplot(pc_data, aes(tSNE_1, tSNE_2)) +
+    geom_point(aes_string(color=pc), alpha = 0.7) +
+    scale_color_gradient(guide = FALSE, low = "grey90", high = "blue")  +
+    geom_text(data=tsne_label, aes(label=ident, x, y)) +
+    ggtitle(pc)
+}) %>% plot_grid(plotlist = .)
+```
+
+We can also view which cells from each condition are in the different clusters.
+
+```{r cluster_sample}
+
+cells_sample1 <- rownames(seurat@meta.data[which(seurat@meta.data$interestingGroups == "control"), ])
+
+p1 <- TSNEPlot(object = seurat, do.label = TRUE, cells.use = cells_sample1, do.return=TRUE)
+
+cells_sample2 <- rownames(seurat@meta.data[which(seurat@meta.data$interestingGroups == "treatment"), ])
+
+p2 <- TSNEPlot(object = seurat, do.label = TRUE, cells.use = cells_sample2, do.return=TRUE)
+
+```
+
+```{r samplegroup_clustering}
+grid.arrange(p1, p2, ncol=2, nrow = 1)
+```
+
+**Figure Legend:** *From left to right, control, treatment**
+
+## Marker checks
+
+To determine whether the clustering seems appropriate, we checked for known markers of different cell types. 
+
+```{r all_markers}
+# Download all markers at https://github.com/hbc/tinyatlas/blob/master/cell_type
+
+# Read into R:
+hbc_markers <- read.csv("path/to/organism.csv")
+hbc_markers <- hbc_markers[hbc_markers$highConf == TRUE, ]
+hbc_markers <- left_join(hbc_markers, annotations, by = c("geneID" = "gene_id"))
+
+# Extract the count information for each cell for the genes of interest from the seurat object
+gene_data <- FetchData(seurat, vars.all = hbc_markers$gene_name)
+
+# Extract tSNE coordinates, sample name, and cluster identity information from the seurat object
+tsne <- FetchData(seurat, 
+                  vars.all = c("tSNE_1", "tSNE_2", "sample", "ident"))
+
+
+# Merge counts for genes of interest with tSNE information
+gene_data <- cbind(tsne, gene_data)
+
+
+# Plot the expression of each of the genes of interest on the tSNE
+map(hbc_markers$gene_name, function(g){
+  ggplot(gene_data, aes(tSNE_1, tSNE_2)) +
+    geom_point(aes_string(color=g), alpha = 0.7, size = 0.3) +
+    scale_color_gradient(guide = FALSE, low = "grey90", high = "blue")  +
+    ggtitle(g)
+}) %>% 
+  plot_grid(plotlist = .)
+```
+
+We can also check markers of interest:
+
+```{r client_markers}
+# Read into R:
+client_markers <- read.csv("path/to/client_markers.csv")
+#client_markers <- left_join(client_markers, annotations, by = c("geneID" = "gene_id"))
+
+# Extract the count information for each cell for the genes of interest from the seurat object
+gene_data <- FetchData(seurat, vars.all = client_markers$gene_name)
+
+# Extract tSNE coordinates, sample name, and cluster identity information from the seurat object
+tsne <- FetchData(seurat, 
+                  vars.all = c("tSNE_1", "tSNE_2", "sample", "ident"))
+
+
+# Merge counts for genes of interest with tSNE information
+gene_data <- cbind(tsne, gene_data)
+
+
+# Plot the expression of each of the genes of interest on the tSNE
+map(client_markers$gene_name, function(g){
+  ggplot(gene_data, aes(tSNE_1, tSNE_2)) +
+    geom_point(aes_string(color=g), alpha = 0.7, size = 0.3) +
+    scale_color_gradient(guide = FALSE, low = "grey90", high = "blue")  +
+    ggtitle(g)
+}) %>% 
+  plot_grid(plotlist = .)
+```
+
+**Summary of the clusters using the given markers:**
+
+Based on these markers, the following are the hypothesized identities of the clusters:
+
+|:---:|:---:|
+| Cluster | Cell type |
+
