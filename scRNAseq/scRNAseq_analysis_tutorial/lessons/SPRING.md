@@ -33,7 +33,7 @@ spring_cells <- rownames(seurat@meta.data[seurat@meta.data$sample == "sample1" |
 spring_counts <- as.matrix(seurat@raw.data[ ,spring_cells])
 
 # Write counts to file
-write.csv(spring_counts, "data/spring_counts.csv", quote= F)
+write.csv(spring_counts, "spring/spring_counts.csv", quote= F)
 ```
 
 > **NOTE:** We could subset by any other factor in the metadata similarly. We could also subset randomly to 10,000 cells by taking a sample of cells:
@@ -52,7 +52,7 @@ The next data we need is the gene names for the extracted counts. We can get the
 
 ```r
 # Write genes to file
-write(rownames(spring_counts), "spring_genes.txt")
+write(rownames(spring_counts), "spring/spring_genes.txt")
 ```
 
 
@@ -68,7 +68,7 @@ seurat@meta.data$ident <- seurat@ident
 spring_seurat <- SubsetData(seurat, cells.use = spring_cells)
 
 # Extract metadata including cell type
-spring_meta <- seurat_10000@meta.data
+spring_meta <- spring_seurat@meta.data
 ```
 
 #### Writing metadata to file
@@ -77,19 +77,19 @@ To write the metadata to file it needs to be in a particular format, which we ca
 
 ```r
 write(c("Cluster", spring_meta$ident), 
-      file = "spring_results/spring_meta.csv", 
+      file = "spring/spring_meta.csv", 
       sep = ",", 
       ncolumns = length(spring_meta$ident) + 1, 
       append = FALSE)
 
 write(c("Condition", spring_meta$interestingGroups), 
-      file = "spring_results/spring_meta.csv", 
+      file = "spring/spring_meta.csv", 
       sep = ",", 
       ncolumns = length(spring_meta$ident) + 1, 
       append = TRUE)
       
 write(c("Phase", spring_meta$phase), 
-      file = "spring_results/spring_meta.csv", 
+      file = "spring/spring_meta.csv", 
       sep = ",", 
       ncolumns = length(spring_meta$ident) + 1, 
       append = TRUE)
