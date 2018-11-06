@@ -20,7 +20,7 @@ The first file to attain is the filtered raw counts object. The easiest method i
 
 ```r
 # Read in seurat object
-seurat <- readRDS("path/to/data/seurat_tsne.rds
+seurat <- readRDS("path/to/data/seurat_tsne.rds")
 ```
 
 **We can directly use this object if it contains less than 10,000 cells.** Alternatively, we could subset the object to the cells that we would like to view:
