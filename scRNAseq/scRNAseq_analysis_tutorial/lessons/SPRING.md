@@ -114,3 +114,5 @@ We encourage watching the 1-2 minute videos available on the [SPRING website](ht
 - Deselection: `command`
 
 After positively and negatively selecting cells, you can view the DE genes/marker genes by clicking on the `enriched genes` on the left-hand side.
+
+**Share the link to this page with your client, and they can interactively play/view the data.**
