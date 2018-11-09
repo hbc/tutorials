@@ -14,7 +14,7 @@ Generally when using SPRING to visualize our data, we will need several files:
 - gene symbols for genes in raw counts matrix
 - metadata for the counts
 
-#### Filtered raw counts
+### Filtered raw counts
 
 The first file to attain is the filtered raw counts object. The easiest method is to access it from the Seurat object with clusters assigned. It is helpful if the clusters are named with the known or hypothesized cell types. So let's read in the seurat object from R:
 
@@ -46,7 +46,7 @@ write.csv(spring_counts, "spring/spring_counts.csv", quote= F)
 > spring_counts_10000 <- as.matrix(seurat@raw.data[ ,sampled_cells])
 > ```
 
-#### Gene names for extracted counts
+### Gene names for extracted counts
 
 The next data we need is the gene names for the extracted counts. We can get the gene names directly from the counts file we just created.
 
@@ -56,7 +56,7 @@ write(rownames(spring_counts), "spring/spring_genes.txt")
 ```
 
 
-#### Metadata
+### Metadata
 
 Finally, the last object we need is any metadata we might want to visualize. Now we can subset the Seurat object and extract the metadata stored in the `meta.data` slot of the Seurat object:
 
@@ -95,7 +95,7 @@ write(c("Phase", spring_meta$phase),
       append = TRUE)
 ```
 
-### SPRING interface
+## SPRING interface
 
 Now that we have the data that we would like to visualize, we can upload it to the [SPRING webserver](https://kleintools.hms.harvard.edu/tools/spring.html). 
 
