@@ -2,7 +2,6 @@
 title: "scRNA-seq: cell clustering"
 author: 
 date: "`r Sys.Date()`"
-bibliography: bibliography.bib
 output: html_document
 ---
 
