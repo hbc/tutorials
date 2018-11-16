@@ -55,10 +55,6 @@ Goals:
 
 Expectations: 
 
-- Reads per cell:
-- Cells per sample:
-- Cell type populations:
-
 * * *
 
 This workflow is adapted from the following sources:
