@@ -14,7 +14,9 @@
 	- What were the sample indices used?
 	- How many cells were encapsulated and sequenced per sample?
 	- What is the main experimental question - does it require clustering using markers and/or cell trajectory analyses?
-	- Handful of markers
+	- What are a handful of markers for the expected cell types using official gene symbols or Ensembl IDs. 
+		- Human gene symbols, clients can search [here](https://www.genenames.org)
+		- Mouse gene symbols, clients can search [here](http://www.informatics.jax.org/marker).
 
 
 2. **Acquire data from sequencing core.** The way in which you handle/process your data will differ depending on the sequencing core that you obtain it from. The key thing to keep in mind is that the input to `bcbio` cannot be demultiplexed. **The data needs to remain multiplexed, but split into four FASTQ files** (R1-R4, as described in detail below).
@@ -47,7 +49,7 @@
 	- Change directories to the sequencing folder downloaded from the facility. The folder should be arranged according to the image below for NextSeq or MiniSeq:
 	
 
-		<img src="../../img/sequencing_dir_org.png" width="400">
+		<img src="../img/sequencing_dir_org.png" width="400">
 		
 		*Image acquired from [bcl2fastq documentation](../../docs/bcl2fastq2_guide_15051736_v2.pdf).* 
 		
@@ -92,7 +94,7 @@
 
 	The reads for each sequence are depicted in the image below:
 
-	<img src="../../img/sc_seq_method.png" width="800">
+	<img src="../img/sc_seq_method.png" width="800">
 	
 	*Image credit: Sarah Boswell, Harvard Staff Scientist for Sequencing Technologies*
 
