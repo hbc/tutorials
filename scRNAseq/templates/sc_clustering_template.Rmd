@@ -2,7 +2,6 @@
 title: "scRNA-seq: cell clustering"
 author: 
 date: "`r Sys.Date()`"
-bibliography: bibliography.bib
 output: html_document
 ---
 
@@ -54,10 +53,6 @@ Experimental description:
 Goals:
 
 Expectations: 
-
-- Reads per cell:
-- Cells per sample:
-- Cell type populations:
 
 * * *
 
