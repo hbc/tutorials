@@ -42,8 +42,8 @@ metadata <- metadata[colnames(counts), ]
 se = SummarizedExperiment(assays = list(counts = as.matrix(counts)),
                           colData = metadata)
 
-design_temp <- ~ nUMI + Phase + condition
-dds <- DESeqDataSet(se, design = design_temp)
+design <- ~ nUMI + Phase + condition
+dds <- DESeqDataSet(se, design = design)
 
 save(dds, se, seurat, file = "data/DESeq_object.rda") 
 
