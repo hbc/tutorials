@@ -8,7 +8,7 @@ This repository contains tutorials for how to perform each part of a single-cell
 
 ### Setting up to run R on O2
 
-- [R on O2](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/setup_R.md)
+- [R on O2](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/R_set-up.md)
 
 ### Analysis workflow with Seurat
 
