@@ -8,19 +8,18 @@ library(DESeq2)
 library(tibble)
 library(BiocParallel)
 
-load("data/DE_analysis_brown_data.rda")
+load("data/DESeq_object.rda")
 
 # Use command line argument for cluster ID
 options(echo=TRUE)
 args <- commandArgs(trailingOnly = TRUE)
 
-ddsraw_cluster <- ddsraw_temp[ ,ddsraw_temp$ident %in% as.character(args[1])]
+dds_cluster <- dds[ , dds$ident %in% as.character(args[1])]
 
-ddsraw_cluster$ident <- droplevels(ddsraw_cluster$ident)
-ddsraw_cluster$sample <- droplevels(ddsraw_cluster$sample)
-ddsraw_cluster$fat <- droplevels(ddsraw_cluster$fat)
+dds_cluster$ident <- droplevels(dds_cluster$ident)
+dds_cluster$sample <- droplevels(dds_cluster$sample)
 
-dds_cluster_conditionB <- DESeq(ddsraw_cluster,
+dds_cluster_lrt <- DESeq(dds_cluster,
         test = "LRT",
         full = ~ nUMI + Phase + condition,
         reduced = ~ nUMI + Phase,
@@ -33,7 +32,7 @@ dds_cluster_conditionB <- DESeq(ddsraw_cluster,
 print("working on next cluster conditionA_vs_conditionB")
 
 # conditionA vs. conditionB
-    contrast_conditionA_vs_conditionB <- c("temperature","conditionA","conditionB")
+    contrast_conditionA_vs_conditionB <- c("condition","conditionA","conditionB")
     dds_conditionA_vs_conditionB_lrt_results_unshrunken <- results(dds_cluster_lrt, contrast=contrast_conditionA_vs_conditionB, cooksCutoff = FALSE)
 dds_conditionA_vs_conditionB_lrt_results_shrunken <- lfcShrink(dds_cluster_lrt,contrast = contrast_conditionA_vs_conditionB, res = dds_conditionA_vs_conditionB_lrt_results_unshrunken)
     save(dds_cluster_lrt, dds_conditionA_vs_conditionB_lrt_results_unshrunken,dds_conditionA_vs_conditionB_lrt_results_shrunken,file = paste0("results/dds_results_conditionA_vs_conditionB",as.character(args[1]),".Rdata"))
@@ -41,7 +40,7 @@ dds_conditionA_vs_conditionB_lrt_results_shrunken <- lfcShrink(dds_cluster_lrt,c
 print("moving on to conditionA_vs_conditionC")
 
 # conditionA vs. conditionC
-contrast_conditionA_vs_conditionC <- c("temperature","conditionA","conditionC")
+contrast_conditionA_vs_conditionC <- c("condition","conditionA","conditionC")
     dds_conditionA_vs_conditionC_lrt_results_unshrunken <- results(dds_cluster_lrt, contrast=contrast_conditionA_vs_conditionC, cooksCutoff = FALSE)
 dds_conditionA_vs_conditionC_lrt_results_shrunken <- lfcShrink(dds_cluster_lrt,contrast = contrast_conditionA_vs_conditionC, res = dds_conditionA_vs_conditionC_lrt_results_unshrunken)
     save(dds_cluster_lrt, dds_conditionA_vs_conditionC_lrt_results_unshrunken,dds_conditionA_vs_conditionC_lrt_results_shrunken,file = paste0("results/dds_results_conditionA_vs_conditionC",as.character(args[1]),".Rdata"))
@@ -49,7 +48,7 @@ dds_conditionA_vs_conditionC_lrt_results_shrunken <- lfcShrink(dds_cluster_lrt,c
 print("moving on to conditionB_vs_conditionC")
 
 # conditionB vs. conditionC
-contrast_conditionB_vs_conditionC <- c("temperature","conditionB","conditionC")
+contrast_conditionB_vs_conditionC <- c("condition","conditionB","conditionC")
     dds_conditionB_vs_conditionC_lrt_results_unshrunken <- results(dds_cluster_lrt, contrast=contrast_conditionB_vs_conditionC, cooksCutoff = FALSE)
 dds_conditionB_vs_conditionC_lrt_results_shrunken <- lfcShrink(dds_cluster_lrt,contrast = contrast_conditionB_vs_conditionC, res = dds_conditionB_vs_conditionC_lrt_results_unshrunken)
     save(dds_cluster_lrt, dds_conditionB_vs_conditionC_lrt_results_unshrunken,dds_conditionB_vs_conditionC_lrt_results_shrunken,file = paste0("results/dds_results_conditionB_vs_conditionC",as.character(args[1]),".Rdata"))
