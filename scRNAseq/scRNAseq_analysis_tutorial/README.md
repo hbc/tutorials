@@ -18,7 +18,9 @@ This repository contains tutorials for how to perform each part of a single-cell
 
 
 ### Downstream analyses
-- [Differential expression analysis with DESeq2]()
+- Differential expression analysis with DESeq2
+  - [Preparation of data for DE analysis with DESeq2](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_prep_for_DESeq2_analysis.Rmd)
+  - [DE analysis report]()
 - [Differential expression analysis with EdgeR]()
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
 
