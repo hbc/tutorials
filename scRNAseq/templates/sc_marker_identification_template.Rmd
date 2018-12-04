@@ -57,13 +57,10 @@ The TSNE plot below can be used for reference when looking for markers of each o
 ```{r setting_up, warning=FALSE, message=FALSE}
 library(Seurat)
 library(tidyverse)
-load("results/markers.rda") # copy over results from O2
-
 library(annotables)
-geneToSymbol <- grcm38[ , c("ensgene", "symbol", "description", "biotype")]
-ann_markers <- left_join(all_markers, geneToSymbol, by = c("gene" = "symbol"))
 
-#write.csv(ann_markers, "results/all_markers_res1.2.csv", quote = FALSE, row.names = FALSE)
+# Load data
+seurat <- readRDS("../2018_11_clustering_final/seurat_tsne.rds")
 
 # Plot the TSNE
 DimPlot(seurat,
@@ -110,6 +107,20 @@ The results table contains the following columns:
 
 
 ```{r marker_expression, warning=FALSE, message=FALSE,}
+# Find all gene markers
+all_markers <-FindAllMarkers(seurat, 
+                             min.pct =  0.25, 
+                             min.diff.pct = 0.25)
+                             
+# Acquire annotation information
+geneToSymbol <- grcm38[ , c("ensgene", "symbol", "description", "biotype")]
+
+# Join annotations with significant markers
+ann_markers <- left_join(all_markers, geneToSymbol, by = c("gene" = "symbol"))
+
+#write.csv(ann_markers, "results/all_markers_res1.2.csv", quote = FALSE, row.names = FALSE)
+
+# Return the top 10 markers for each cluster
 top10_anno <- ann_markers %>%
         group_by(cluster) %>%
         top_n(10, avg_logFC)
