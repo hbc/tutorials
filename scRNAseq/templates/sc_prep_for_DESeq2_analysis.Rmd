@@ -15,7 +15,7 @@ seurat <- readRDS("/path/to/seurat_tsne.rds")
 # List of current cluster IDs
 current_cluster_ids <- c()
 
-# List of new cluster IDs
+# List of new cluster IDs - do not use any spaces or symbols - snake_case or camelCase is best
 new_cluster_ids <- c()
 
 seurat@ident <- plyr::mapvalues(x = seurat@ident, 
