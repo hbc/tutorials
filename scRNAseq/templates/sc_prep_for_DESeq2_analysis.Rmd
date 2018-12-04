@@ -1,5 +1,6 @@
 # Preparing for DE analysis
 
+```{r creating_DESeq2_object}
 # Load libraries
 library(SummarizedExperiment)
 library(DESeq2)
