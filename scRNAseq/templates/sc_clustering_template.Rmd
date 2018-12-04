@@ -1,6 +1,6 @@
 ---
-title: "BAT clustering res1.2"
-author: "Mary Piper"
+title: ""
+author: ""
 date: "`r Sys.Date()`"
 output: html_document
 ---
