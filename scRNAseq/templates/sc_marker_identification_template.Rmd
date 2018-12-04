@@ -1,0 +1,200 @@
+---
+title: ""
+author: ""
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, cache=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Load libraries
+library(Seurat)
+library(knitr)
+library(rmarkdown)
+library(tidyverse)
+library(Matrix)
+library(AnnotationHub)
+library(ensembldb)
+library(scales)
+library(cowplot)
+library(gridExtra)
+
+# Set seed for reproducibility
+set.seed(1454944673L)
+opts_chunk[["set"]](
+    audodep = TRUE,
+    cache = FALSE,
+    cache.lazy = FALSE,
+    error = TRUE,
+    echo = FALSE,
+    fig.height = 10L,
+    fig.retina = 2L,
+    fig.width = 10L,
+    message = FALSE,
+    tidy = TRUE,
+    warning = TRUE
+)
+```
+
+# Overview
+
+- Principal Investigator: 
+- Researcher: 
+- Experiment: 
+
+Experimental description:
+
+
+* * *
+
+# Overview of clusters
+
+For this marker identification analysis, we used Seurat to find markers that define clusters via differential expression. 
+
+The TSNE plot below can be used for reference when looking for markers of each of the different clusters. 
+
+
+```{r setting_up, warning=FALSE, message=FALSE}
+library(Seurat)
+library(tidyverse)
+load("results/markers.rda") # copy over results from O2
+
+library(annotables)
+geneToSymbol <- grcm38[ , c("ensgene", "symbol", "description", "biotype")]
+ann_markers <- left_join(all_markers, geneToSymbol, by = c("gene" = "symbol"))
+
+#write.csv(ann_markers, "results/all_markers_res1.2.csv", quote = FALSE, row.names = FALSE)
+
+# Plot the TSNE
+DimPlot(seurat,
+        "tsne",
+        do.label = TRUE,
+        do.return = TRUE,
+        label.size = 6,
+        plot.title = "tSNE") 
+```
+
+
+# Marker identification
+
+There are a few different types of marker identification that we will explore. Each with their own benefits and drawbacks:
+
+1. **Identification of all markers for each cluster:** this analysis compares each cluster against all others and outputs the genes that are differentially expressed/present. 
+2. **Identification of conserved markers for each cluster regardless of temperature:** This analysis looks for those genes that are conserved in the cluster across all temperature groups. This analysis will output genes that are consistently differentially expressed/present for all of the sample groups. These genes can help to figure out the identity for the cluster. Therefore, I only performed this analysis for those clusters whose identity was uncertain or novel.
+3. **Marker identification between specific clusters:** this analysis explores differentially expressed genes between specific clusters. This analysis is most useful for determining differences in gene expression between clusters with markers that are similar in the above analyses. 
+
+## Identification of all markers for each cluster
+
+For this analysis we are comparing each cluster against all other clusters to identify cluster markers. 
+
+To be identified as a marker, we specified that a gene needed to be detected at a minimum percentage of 0.25 in either of the two groups of cells and difference in expression is at least 0.25 between the two groups.
+
+Usually the top markers are relatively trustworthy, but because of inflated p-values, many of the less significant genes are not so trustworthy as markers. 
+
+When looking at the output, we suggest looking for markers with large differences in expression between `pct.1` and `pct.2` and larger fold changes. For instance if `pct.1` = 0.90 and `pct.2` = 0.80, I might not be as excited about that marker. However, if `pct.2` = 0.1 instead, then I would be much more excited about it. Also, I look for the majority of cells expressing marker in my cluster of interest. If `pct.1` is low, such as 0.3, I again might not be as interested in it.
+
+[Download all marker results](results/all_markers_res1.2.csv)
+
+The results table contains the following columns:
+
+- **cluster:** number corresponding to cluster
+- **gene:** gene symbol
+- **ensgene:** Ensembl gene ID
+- **avg_logFC:** average log2 fold change. Positive values indicate that the gene is more highly expressed in the cluster.
+- **pct.1**: The percentage of cells where the gene is detected in the cluster
+- **pct.2**: The percentage of cells where the gene is detected on average in the other clusters
+- **p_val:** p-value not adjusted for multiple test correction
+- **p_val_adj:** Adjusted p-value, based on bonferroni correction using all genes in the dataset, used to determine significance
+- **description:** gene description
+- **biotype:** type of gene
+
+
+```{r marker_expression, warning=FALSE, message=FALSE,}
+top10_anno <- ann_markers %>%
+        group_by(cluster) %>%
+        top_n(10, avg_logFC)
+```
+
+
+**The markers for cluster 'clustername1':**
+
+```{r expression_plots_clustername1, warning=FALSE, message=FALSE}
+
+clustername1_top10 <- top10_anno[top10_anno$cluster == "clustername1" , c(6:8, 2:4, 1, 5, 9:10)]
+
+top5_anno_clustername1 <- clustername1_top10[which(!(duplicated(clustername1_top10$gene))), ] %>%
+        top_n(5, avg_logFC) 
+
+knitr::kable(top5_anno_clustername1)
+
+FeaturePlot(object = seurat, features.plot = top5_anno_clustername1$gene, cols.use = c("grey", "blue"), 
+    reduction.use = "tsne")
+```
+
+**The markers for cluster 'clustername2':**
+
+```{r expression_plots_clustername2, warning=FALSE, message=FALSE}
+
+clustername2_top10 <- top10_anno[top10_anno$cluster == "clustername2" , c(6:8, 2:4, 1, 5, 9:10)]
+
+top5_anno_clustername2 <- clustername2_top10[which(!(duplicated(clustername2_top10$gene))), ] %>%
+        top_n(5, avg_logFC) 
+
+knitr::kable(top5_anno_clustername2)
+
+FeaturePlot(object = seurat, features.plot = top5_anno_clustername2$gene, cols.use = c("grey", "blue"), 
+    reduction.use = "tsne")
+```
+
+## Identification of conserved markers for each cluster regardless of temperature
+
+This next analysis looks for those genes that are conserved in the cluster across all temperature groups for the clusters that are uncertain or unknown. Please look through these lists to determine whether the markers make sense for the annotated clusters and to help identify clusters # and #.
+
+**The conserved markers for cluster 'clustername':**
+
+```{r cons_markers_ve_proj_pdgfrb}
+ann_cons_markers_clustername <- cons_markers_clustername %>%
+        rownames_to_column(var = "gene") %>%
+        left_join(geneToSymbol, by = c("gene" = "symbol"))
+
+ann_cons_markers_clustername <- ann_cons_markers_clustername[which(!(duplicated(ann_cons_markers_clustername$gene))), ]
+
+knitr::kable(head(ann_cons_markers_clustername, n=5))
+
+#write.csv(ann_cons_markers_clustername, "results/clustername_markers_conserved.csv", quote = FALSE)
+```
+
+[Download all conserved marker results](results/clustername_markers_conserved.csv)
+
+## Marker identification between specific clusters:
+
+To further elucidate the different cell types and to identify whether to merge particular clusters, I also performed marker identification between specific clusters as shown below. Note that I included a minimum percent difference threshold of 0.15, which is less stringent than the previous threshold used to detect all markers (0.25) since these cells are more similar to each other.
+
+**The markers for clustername1 vs clustername2:**
+
+```{r clustername1vs2, warning=FALSE, message=FALSE}
+clustername1_vs_clustername2_markers <- FindMarkers(object = seurat, ident.1 = "clustername1", ident.2= "clustername2", min.pct = 0.25, min.diff.pct = 0.15)
+
+ann_clustername1_vs_clustername2_markers <- clustername1_vs_clustername2_markers %>%
+        rownames_to_column(var = "gene") %>%
+        left_join(geneToSymbol, by = c("gene" = "symbol"))
+
+ann_clustername1_vs_clustername2_markers <- ann_clustername1_vs_clustername2_markers[which(!(duplicated(ann_clustername1_vs_clustername2_markers$gene))), ]
+
+knitr::kable(head(ann_clustername1_vs_clustername2_markers, n=5))
+
+#write.csv(ann_clusterVE_markers, "results/ann_clustername1_vs_clustername2_markers.csv", quote = FALSE)
+
+FeaturePlot(object = seurat, features.plot = head(ann_clustername1_vs_clustername2_markers, n=5)$gene, cols.use = c("grey", "blue"), 
+    reduction.use = "tsne")
+```
+
+[Download all marker results](results/ann_clustername1_vs_clustername2_markers.csv)
+
+
+
+# Conclusions
+
+```{r sessioninfo}
+sessionInfo()
+```
