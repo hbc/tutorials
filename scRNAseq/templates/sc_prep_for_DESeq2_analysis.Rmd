@@ -45,5 +45,7 @@ se = SummarizedExperiment(assays = list(counts = as.matrix(counts)),
 design_temp <- ~ nUMI + Phase + condition
 dds <- DESeqDataSet(se, design = design_temp)
 
-save(dds, se, seurat, file = "data/DE_analysis_data.rda")
+save(dds, se, seurat, file = "data/DESeq_object.rda") 
+
+# Use this object as input to the DE analysis scripts (https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/DESeq2_analysis_inner.R and https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/DESeq2_analysis_outer.R)
 ```
