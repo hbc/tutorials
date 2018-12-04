@@ -1,0 +1,48 @@
+# Preparing for DE analysis
+
+# Load libraries
+library(SummarizedExperiment)
+library(DESeq2)
+
+# Load clustered seurat object
+seurat <- readRDS("/path/to/seurat_tsne.rds")
+
+#levels(seurat@ident)
+
+## Subset and re-assign clusters as needed
+
+# List of current cluster IDs
+current_cluster_ids <- c()
+
+# List of new cluster IDs
+new_cluster_ids <- c()
+
+seurat@ident <- plyr::mapvalues(x = seurat@ident, 
+                                from = current_cluster_ids, 
+                                to = new_cluster_ids)
+# Re-run TSNE with cell types
+TSNEPlot(object = seurat, 
+         do.label = TRUE, 
+         pt.size = 0.5)
+
+# Remove 'clusterA' - likely junk
+seurat <- SubsetData(seurat, cells.use = seurat@ident != "clusterA")
+
+# Creating DESeq2 object
+counts <- as.matrix(seurat@raw.data)
+counts <- counts[, colnames(seurat@data)]
+counts <- counts[Matrix::rowSums(counts >= 5) >= 5, ]
+
+metadata <- seurat@meta.data
+metadata$ident <- seurat@ident
+metadata <- metadata[colnames(counts), ]
+
+
+se = SummarizedExperiment(assays = list(counts = as.matrix(counts)),
+                          colData = metadata)
+
+design_temp <- ~ nUMI + Phase + condition
+dds <- DESeqDataSet(se, design = design_temp)
+
+save(dds, se, seurat, file = "data/DE_analysis_data.rda")
+```
