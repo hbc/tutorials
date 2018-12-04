@@ -6,6 +6,10 @@ This repository contains tutorials for how to perform each part of a single-cell
 
 - [Running bcbio](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/01_bcbio_run.md)
 
+### Setting up to run R on O2
+
+- [R on O2](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/setup_R.md)
+
 ### Analysis workflow with Seurat
 
 - [Quality control analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_quality_control_analysis.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_QC_template.Rmd))
