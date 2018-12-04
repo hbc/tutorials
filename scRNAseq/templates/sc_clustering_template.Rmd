@@ -1,11 +1,11 @@
 ---
-title: "scRNA-seq: cell clustering"
-author: 
+title: "BAT clustering res1.2"
+author: "Mary Piper"
 date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r setup, cache=FALSE, message=FALSE, warning=FALSE}
+```{r setup, cache=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 # Load libraries
@@ -17,13 +17,15 @@ library(Matrix)
 library(AnnotationHub)
 library(ensembldb)
 library(scales)
+library(cowplot)
+library(gridExtra)
 
 # Set seed for reproducibility
 set.seed(1454944673L)
 
 opts_chunk[["set"]](
     audodep = TRUE,
-    cache = TRUE,
+    cache = FALSE,
     cache.lazy = FALSE,
     error = TRUE,
     echo = FALSE,
@@ -34,25 +36,16 @@ opts_chunk[["set"]](
     tidy = TRUE,
     warning = TRUE
 )
-
-theme_set(
-    theme_paperwhite(
-        base_size = 14L,
-        legend_position = "bottom"
-    )
-)
 ```
 
 # Overview
 
-- Principal Investigator / Researcher: 
+- Principal Investigator: 
+- Researcher: 
 - Experiment: 
 
 Experimental description:
 
-Goals:
-
-Expectations: 
 
 * * *
 
@@ -76,7 +69,7 @@ To identify clusters, the following steps will be performed:
 In this report, we are exploring the clustering of cells by similarities in gene expression.
 
 ```{r data, message=FALSE, warning=FALSE}
-# Use script () on O2 to generate the cell clusters and save to an .rds file
+# You can use scripts at https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/clustering_pre_regress.R and https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/clustering_regress.R on O2 to generate the cell clusters and save to .rds files
 
 pre_regressed_seurat <- readRDS("path/to/data/pre_regressed_seurat.rds") 
 
@@ -223,10 +216,27 @@ DimPlot(seurat,
         plot.title = "PCA")
 ```
 
+### UMAP
 
-## Cluster quality control
+Uniform Manifold Approximation and Projection (UMAP) is a dimensionality reduction technique that is similar to t-SNE, but where the distances between cells represent similarity in expression. We can explore the similarity in gene expression between clusters a bit more easily with UMAP.
 
-Exploration of quality control metrics
+```{r umap, results="asis"}
+# To run UMAP, you need to install the tool using the command line with `conda install -c conda-forge umap-learn`. After successfully installed you will be able to run the following commands:
+
+# Run UMAP
+seurat <- RunUMAP(seurat, reduction.use = "pca", dims.use = 1:pcs)
+
+# Plot the UMAP
+DimPlot(seurat,
+        "umap",
+        do.label = TRUE,
+        do.return = TRUE,
+        label.size = 6,
+        plot.title = "UMAP")
+```
+
+## Exploration of quality control metrics
+
 To determine whether our clusters might be due to artifacts such as cell cycle phase or mitochondrial expression, it can be useful to explore these metrics visually to see if any clusters exhibit enrichment or are different from the other clusters. However, if enrichment or differences are observed for particular clusters it may not be worrisome if it can be explained by the cell type. 
 
 We can start by exploring the distribution of cells per cluster for each sample:
