@@ -418,6 +418,9 @@ map(client_markers$gene_name, function(g){
     ggtitle(g)
 }) %>% 
   plot_grid(plotlist = .)
+  
+# Save seurat object for marker identification and DE analysis
+write_rds(seurat, "data/seurat_tsne.rds")
 ```
 
 **Summary of the clusters using the given markers:**
@@ -445,6 +448,6 @@ TSNEPlot(object = seurat_assigned,
          do.label = TRUE, 
          pt.size = 0.5)
 
-
+# Save assigned seurat for SPRING or marker identification
 write_rds(seurat_assigned, "data/seurat_tsne_assigned.rds")
 ```
