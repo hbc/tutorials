@@ -80,6 +80,119 @@ There are a few different types of marker identification that we will explore. E
 2. **Identification of conserved markers for each cluster regardless of temperature:** This analysis looks for those genes that are conserved in the cluster across all temperature groups. This analysis will output genes that are consistently differentially expressed/present for all of the sample groups. These genes can help to figure out the identity for the cluster. Therefore, I only performed this analysis for those clusters whose identity was uncertain or novel.
 3. **Marker identification between specific clusters:** this analysis explores differentially expressed genes between specific clusters. This analysis is most useful for determining differences in gene expression between clusters with markers that are similar in the above analyses. 
 
+---
+title: "WAT marker identification res1.4"
+author: "Mary Piper"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, cache=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Load libraries
+library(Seurat)
+library(knitr)
+library(rmarkdown)
+library(tidyverse)
+library(Matrix)
+library(AnnotationHub)
+library(ensembldb)
+library(scales)
+library(cowplot)
+library(gridExtra)
+# Set seed for reproducibility
+set.seed(1454944673L)
+opts_chunk[["set"]](
+    audodep = TRUE,
+    cache = FALSE,
+    cache.lazy = FALSE,
+    error = TRUE,
+    echo = FALSE,
+    fig.height = 10L,
+    fig.retina = 2L,
+    fig.width = 10L,
+    message = FALSE,
+    tidy = TRUE,
+    warning = TRUE
+)
+```
+
+# Overview
+
+- Principal Investigator: Yu-ha Tseng
+- Researcher: Farnaz Shamsi
+- Experiment: Characterization of adipose tissue niche with changes in temperature
+
+Exploration of the adipose tissue niche, with the adipocytes removed. Mice were exposed to three different temperatures (cold, room temp, and thermal neutral), with one mouse per temperature for 7 days. From each animal, the white adipose tissue was harvested from the subcutaneous region in the legs and the brown adipose tissue was harvested from the interscapular region in the neck. 
+
+At cold temperatures, the white adipose tissue develops features that are more brown-like, and is referred to as beige. The goals of this analysis are:
+
+- Determine quality of the samples - this is a pilot and can add more samples if good quality
+- Compare brown adipose tissue at each temperature and white adipose tissue at each temperature
+- Determine the identity and differential abundance of cell clusters between temperatures
+- Explore what changes occur in the different cell populations: adipose progenitors, vascular tissue, neurons, immune cells at the different temperatures
+
+* * *
+
+# Overview of clusters
+
+For this marker identification analysis, we used Seurat to find markers that define clusters via differential expression. 
+
+The TSNE plot below can be used for reference when looking for markers of each of the different clusters. 
+
+
+```{r setting_up, cache=TRUE, warning=FALSE, message=FALSE}
+library(Seurat)
+library(tidyverse)
+all_markers <- readRDS("WAT_results/seurat_white_res.1.4_all_markers.rds")
+seurat <- readRDS("../clustering_final/data/seurat_white_res.1.4_tsne_assigned.rds")
+library(AnnotationHub)
+library(ensembldb)
+
+
+## Connect to AnnotationHub
+ah <- AnnotationHub()
+## Access the Ensembl database for organism
+ahDb <- query(ah, 
+              pattern = c("Mus musculus", "EnsDb"), 
+              ignore.case = TRUE)
+## Acquire the latest annotation files
+id <- ahDb %>%
+        mcols() %>%
+        rownames() %>%
+        tail(n = 1)
+## Download the appropriate Ensembldb database
+edb <- ah[[id]]
+## Extract gene-level information from database
+annotations <- genes(edb, 
+                     return.type = "data.frame")
+## Select annotations of interest
+annotations <- annotations %>%
+        dplyr::select(gene_id, gene_name, gene_biotype, description)
+
+ann_markers <- left_join(all_markers, annotations, by = c("gene" = "gene_name"))
+
+
+#write.csv(ann_markers, "WAT_results/tseng_all_WAT_markers_res1.4.csv", quote = FALSE, row.names = FALSE)
+
+# Plot the TSNE
+DimPlot(seurat,
+        "tsne",
+        do.label = TRUE,
+        do.return = TRUE,
+        label.size = 4,
+        plot.title = "tSNE") 
+```
+
+
+# Marker identification
+
+There are a few different types of marker identification that we could explore. Each with their own benefits and drawbacks:
+
+1. **Identification of all markers for each cluster:** this analysis compares each cluster against all others and outputs the genes that are differentially expressed/present. 
+2. **Identification of conserved markers for each cluster regardless of temperature:** This analysis looks for those genes that are conserved in the cluster across all temperature groups. This analysis will output genes that are consistently differentially expressed/present for all of the temperature groups. These genes can help to figure out the identity for the cluster. Therefore, I only performed this analysis for those clusters whose identity was uncertain or novel.
+3. **Marker identification between specific clusters:** this analysis explores differentially expressed genes between specific clusters. This analysis is most useful for determining differences in gene expression between clusters with markers that are similar in the above analyses. 
+
 ## Identification of all markers for each cluster
 
 For this analysis we are comparing each cluster against all other clusters to identify cluster markers. 
@@ -90,121 +203,146 @@ Usually the top markers are relatively trustworthy, but because of inflated p-va
 
 When looking at the output, we suggest looking for markers with large differences in expression between `pct.1` and `pct.2` and larger fold changes. For instance if `pct.1` = 0.90 and `pct.2` = 0.80, I might not be as excited about that marker. However, if `pct.2` = 0.1 instead, then I would be much more excited about it. Also, I look for the majority of cells expressing marker in my cluster of interest. If `pct.1` is low, such as 0.3, I again might not be as interested in it.
 
-[Download all marker results](results/all_markers_res1.2.csv)
+[Download all marker results](WAT_results/tseng_all_WAT_markers_res1.4.csv)
 
 The results table contains the following columns:
 
 - **cluster:** number corresponding to cluster
 - **gene:** gene symbol
-- **ensgene:** Ensembl gene ID
+- **gene_id:** Ensembl gene ID
 - **avg_logFC:** average log2 fold change. Positive values indicate that the gene is more highly expressed in the cluster.
 - **pct.1**: The percentage of cells where the gene is detected in the cluster
 - **pct.2**: The percentage of cells where the gene is detected on average in the other clusters
 - **p_val:** p-value not adjusted for multiple test correction
 - **p_val_adj:** Adjusted p-value, based on bonferroni correction using all genes in the dataset, used to determine significance
+- **gene_biotype:** type of gene
 - **description:** gene description
-- **biotype:** type of gene
+
 
 
 ```{r marker_expression, warning=FALSE, message=FALSE,}
-# Find all gene markers
-all_markers <-FindAllMarkers(seurat, 
-                             min.pct =  0.25, 
-                             min.diff.pct = 0.25)
-                             
-# Acquire annotation information
-geneToSymbol <- grcm38[ , c("ensgene", "symbol", "description", "biotype")]
-
-# Join annotations with significant markers
-ann_markers <- left_join(all_markers, geneToSymbol, by = c("gene" = "symbol"))
-
-#write.csv(ann_markers, "results/all_markers_res1.2.csv", quote = FALSE, row.names = FALSE)
-
-# Return the top 10 markers for each cluster
+# Top 10 markers for each cluster
 top10_anno <- ann_markers %>%
         group_by(cluster) %>%
         top_n(10, avg_logFC)
+        
+# Function to extract clusters for plotting top 5 markers
+extract_cluster_markers <- function(cluster_name){
+top10 <- top10_anno[top10_anno$cluster == cluster_name, c(6:8, 2:4, 1, 5, 9:10)]
+
+top5_anno <- top10[which(!(duplicated(top10$gene))), ] %>%
+        top_n(5, avg_logFC)
+
+return(top5_anno)
+
+}
+
+
 ```
 
 
-**The markers for cluster 'clustername1':**
+**The markers for cluster 'cluster1':**
 
-```{r expression_plots_clustername1, warning=FALSE, message=FALSE}
+```{r expression_plots_cluster1, warning=FALSE, message=FALSE}
 
-clustername1_top10 <- top10_anno[top10_anno$cluster == "clustername1" , c(6:8, 2:4, 1, 5, 9:10)]
+top5_anno <- extract_cluster_markers("cluster1")
 
-top5_anno_clustername1 <- clustername1_top10[which(!(duplicated(clustername1_top10$gene))), ] %>%
-        top_n(5, avg_logFC) 
+knitr::kable(top5_anno)
 
-knitr::kable(top5_anno_clustername1)
-
-FeaturePlot(object = seurat, features.plot = top5_anno_clustername1$gene, cols.use = c("grey", "blue"), 
-    reduction.use = "tsne")
+FeaturePlot(object = seurat, 
+            features.plot = top5_anno$gene, 
+            cols.use = c("grey", "blue"), 
+            reduction.use = "tsne")
 ```
 
-**The markers for cluster 'clustername2':**
+**The markers for cluster 'cluster2':**
 
-```{r expression_plots_clustername2, warning=FALSE, message=FALSE}
+```{r expression_plots_cluster2, warning=FALSE, message=FALSE}
 
-clustername2_top10 <- top10_anno[top10_anno$cluster == "clustername2" , c(6:8, 2:4, 1, 5, 9:10)]
+top5_anno <- extract_cluster_markers("cluster2")
 
-top5_anno_clustername2 <- clustername2_top10[which(!(duplicated(clustername2_top10$gene))), ] %>%
-        top_n(5, avg_logFC) 
+knitr::kable(top5_anno)
 
-knitr::kable(top5_anno_clustername2)
+FeaturePlot(object = seurat, 
+            features.plot = top5_anno$gene, 
+            cols.use = c("grey", "blue"), 
+            reduction.use = "tsne")
 
-FeaturePlot(object = seurat, features.plot = top5_anno_clustername2$gene, cols.use = c("grey", "blue"), 
-    reduction.use = "tsne")
 ```
 
-## Identification of conserved markers for each cluster regardless of temperature
+## Identification of conserved markers across conditions
 
-This next analysis looks for those genes that are conserved in the cluster across all temperature groups for the clusters that are uncertain or unknown. Please look through these lists to determine whether the markers make sense for the annotated clusters and to help identify clusters # and #.
+This next analysis looks for those genes that are conserved in the cluster across all conditions, which is particularly useful for the clusters that are uncertain or unknown. Please look through these lists to determine whether the markers make sense for the annotated clusters and to help identify the unknown clusters.
 
-**The conserved markers for cluster 'clustername':**
+**The conserved markers for cluster 'cluster1':**
 
-```{r cons_markers_ve_proj_pdgfrb}
-ann_cons_markers_clustername <- cons_markers_clustername %>%
+```{r cons_markers_cluster1}
+# Function to extract clusters for plotting
+extract_conserved_markers <- function(cluster_name){
+        
+        conserved_markers <- readRDS(paste0("results/", cluster_name, "_markers_conserved.rds" )) %>%
         rownames_to_column(var = "gene") %>%
-        left_join(geneToSymbol, by = c("gene" = "symbol"))
+        left_join(annotations, by = c("gene" = "gene_name"))
+        
+        conserved_markers <-  conserved_markers[which(!(duplicated( conserved_markers$gene))), ]
 
-ann_cons_markers_clustername <- ann_cons_markers_clustername[which(!(duplicated(ann_cons_markers_clustername$gene))), ]
+}
 
-knitr::kable(head(ann_cons_markers_clustername, n=5))
+conserved_markers <- extract_conserved_markers("cluster1")
 
-#write.csv(ann_cons_markers_clustername, "results/clustername_markers_conserved.csv", quote = FALSE)
+write.csv(conserved_markers, paste0("results/cluster1_markers_conserved.csv"), quote = FALSE)
+
+knitr::kable(head(conserved_markers, n=5))
+
 ```
 
-[Download all conserved marker results](results/clustername_markers_conserved.csv)
+[Download all conserved marker results](results/cluster1_markers_conserved.csv)
+
+
+**The conserved markers for cluster 'cluster2':**
+
+```{r cons_markers_cluster2}
+# Function to extract clusters for plotting
+
+conserved_markers <- extract_conserved_markers("cluster2")
+
+write.csv(conserved_markers, paste0("results/cluster2_markers_conserved.csv"), quote = FALSE)
+
+knitr::kable(head(conserved_markers, n=5))
+
+```
+
+[Download all conserved marker results](results/cluster2_markers_conserved.csv)
+
 
 ## Marker identification between specific clusters:
 
 To further elucidate the different cell types and to identify whether to merge particular clusters, I also performed marker identification between specific clusters as shown below. Note that I included a minimum percent difference threshold of 0.15, which is less stringent than the previous threshold used to detect all markers (0.25) since these cells are more similar to each other.
 
-**The markers for clustername1 vs clustername2:**
+**The markers for cluster1 vs cluster2:**
 
-```{r clustername1vs2, warning=FALSE, message=FALSE}
-clustername1_vs_clustername2_markers <- FindMarkers(object = seurat, ident.1 = "clustername1", ident.2= "clustername2", min.pct = 0.25, min.diff.pct = 0.15)
+```{r cluster1_vs_cluster2, warning=FALSE, message=FALSE}
+cluster2vs1_markers <- FindMarkers(object = seurat, ident.1 = "cluster1", ident.2= "cluster2", min.pct = 0.25, min.diff.pct = 0.15)
 
-ann_clustername1_vs_clustername2_markers <- clustername1_vs_clustername2_markers %>%
+ann_cluster2vs1_markers <- cluster2vs1_markers %>%
         rownames_to_column(var = "gene") %>%
-        left_join(geneToSymbol, by = c("gene" = "symbol"))
+        left_join(annotations, by = c("gene" = "gene_name"))
 
-ann_clustername1_vs_clustername2_markers <- ann_clustername1_vs_clustername2_markers[which(!(duplicated(ann_clustername1_vs_clustername2_markers$gene))), ]
+ann_cluster2vs1_markers <- ann_cluster2vs1_markers[which(!(duplicated(ann_cluster2vs1_markers$gene))), ]
 
-knitr::kable(head(ann_clustername1_vs_clustername2_markers, n=5))
+knitr::kable(head(ann_cluster2vs1_markers, n=5))
 
-#write.csv(ann_clusterVE_markers, "results/ann_clustername1_vs_clustername2_markers.csv", quote = FALSE)
+#write.csv(ann_cluster2vs1_markers, "results/cluster2vs1_markers.csv", quote = FALSE)
 
-FeaturePlot(object = seurat, features.plot = head(ann_clustername1_vs_clustername2_markers, n=5)$gene, cols.use = c("grey", "blue"), 
+FeaturePlot(object = seurat, features.plot = head(ann_cluster2vs1_markers, n=5)$gene, cols.use = c("grey", "blue"), 
     reduction.use = "tsne")
 ```
 
-[Download all marker results](results/ann_clustername1_vs_clustername2_markers.csv)
-
-
+[Download all marker results](results/cluster2vs1_markers.csv)
 
 # Conclusions
+
+It may also be helpful to explore these markers in the SPRING interface I sent with the clustering report.
 
 ```{r sessioninfo}
 sessionInfo()
