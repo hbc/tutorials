@@ -427,3 +427,24 @@ Based on these markers, the following are the hypothesized identities of the clu
 |:---:|:---:|
 | Cluster | Cell type |
 
+
+```{r new_ids}
+# List of current cluster IDs
+current_cluster_ids <- 0:length(levels(seurat@ident)) - 1
+
+# List of new cluster IDs
+new_cluster_ids <- c("")
+
+# Changing IDs to cell type
+seurat_assigned <- seurat
+seurat_assigned@ident <- plyr::mapvalues(x = seurat_assigned@ident, 
+                                from = current_cluster_ids, 
+                                to = new_cluster_ids)
+# Re-run TSNE with cell types
+TSNEPlot(object = seurat_assigned, 
+         do.label = TRUE, 
+         pt.size = 0.5)
+
+
+write_rds(seurat_assigned, "data/seurat_tsne_assigned.rds")
+```
