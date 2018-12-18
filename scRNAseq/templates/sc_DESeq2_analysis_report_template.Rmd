@@ -1,0 +1,182 @@
+---
+title: ""
+author: ""
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, cache=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Load libraries
+library(Seurat)
+library(knitr)
+library(rmarkdown)
+library(tidyverse)
+library(Matrix)
+library(AnnotationHub)
+library(ensembldb)
+library(scales)
+library(cowplot)
+library(gridExtra)
+# Set seed for reproducibility
+set.seed(1454944673L)
+opts_chunk[["set"]](
+    audodep = TRUE,
+    cache = FALSE,
+    cache.lazy = FALSE,
+    error = TRUE,
+    echo = FALSE,
+    fig.height = 10L,
+    fig.retina = 2L,
+    fig.width = 10L,
+    message = FALSE,
+    tidy = TRUE,
+    warning = TRUE
+)
+```
+
+# Overview
+
+- Principal Investigator:
+- Researcher: 
+- Experiment: 
+- Description:
+
+
+* * *
+
+# Differential expression analysis report 
+
+## All cell types
+
+Across many of the different cell types we see the same genes appearing as differentially expressed, including Prr15, many mitochondrial genes and hemoglobin genes (as well as some pseudogenes). If a gene is DE in the majority of the cell type clusters, then I have included it in this section and removed it from the other overviews for each of the other cell types. I plotted the gene expression across temperature to explore these genes in a bit more detil below:
+
+```{r all_sig, out.width='33%'}
+cluster_sig_results <- list()
+
+for (cluster in c()){
+
+# Loading cluster-specific data - conditionA_vs_conditionB
+load(paste0("path/to/results/dds_results_conditionA_vs_conditionB_"), cluster, ".Rdata") # This file was output on O2 from the DESeq2 script (https://github.com/hbc/tutorials/blob/master/scRNAseq/scripts/sc_DESeq2_analysis_inner.R).
+
+# Extracting results
+all_results_conditionA_vs_conditionB <- data.frame(dds_conditionA_vs_conditionB_lrt_results_shrunken)
+
+colnames(all_results_conditionA_vs_conditionB)[2] <- "LFC-conditionA_vs_conditionB"
+colnames(all_results_conditionA_vs_conditionB)[3] <- "SE-conditionA_vs_conditionB"
+
+# Merge results with annotations
+cluster_annot_results <- merge(all_results_conditionA_vs_conditionB, annotations, by.x=0, by.y="gene_name")
+
+# Loading cluster-specific data - conditionA_vs_conditionC
+load(paste0("path/to/results/dds_results_conditionA_vs_conditionC_"), cluster, ".Rdata") 
+
+# Extracting results
+all_results_conditionA_vs_conditionC <- data.frame(dds_conditionA_vs_conditionC_lrt_results_shrunken)
+
+colnames(all_results_conditionA_vs_conditionC)[2] <- "LFC-conditionA_vs_conditionC"
+colnames(all_results_conditionA_vs_conditionC)[3] <- "SE-conditionA_vs_conditionC"
+
+# Merge results with annotations
+cluster_annot_results <- merge(cluster_annot_results, all_results_conditionA_vs_conditionC, by.x="Row.names", by.y=0)
+
+# Loading cluster-specific data - conditionA_vs_conditionC
+load(paste0("path/to/results/dds_results_conditionB_vs_conditionC_"), cluster, ".Rdata") 
+
+# Extracting results
+all_results_conditionB_vs_conditionC <- data.frame(dds_conditionB_vs_conditionC_lrt_results_shrunken)
+
+colnames(all_results_conditionB_vs_conditionC)[2] <- "LFC-conditionB_vs_conditionC"
+colnames(all_results_conditionB_vs_conditionC)[3] <- "SE-conditionB_vs_conditionC"
+
+# Merge results with annotations
+cluster_annot_results <- merge(cluster_annot_results, all_results_conditionB_vs_conditionC, by.x="Row.names", by.y=0)
+
+# Arrange by padj
+cluster_annot_results <- dplyr::arrange(cluster_annot_results, padj)
+
+# Reorder columns
+cluster_annot_results <- cluster_annot_results[, c(1:4, 11:14, 5:10)]
+
+colnames(cluster_annot_results)[1] <- "Gene_symbol"
+
+cluster_annot_results <- cluster_annot_results[which(!(duplicated(cluster_annot_results$Gene_symbol))), ]
+
+
+# write.csv(cluster_annot_results, paste0("results/", cluster, "_DE_all_results.csv"), quote = FALSE)
+
+# Extract significant genes
+sig_genes <- dplyr::filter(cluster_annot_results, padj < 0.05)
+
+cluster_sig_results[[cluster]] <- sig_genes
+
+# write.csv(sig_genes, paste0("results/", cluster, "DE_sig_results.csv"), quote = FALSE)
+}
+
+# Genes present in the majority of analyses
+
+intersection_genes <- Reduce(intersect, cluster_sig_results)
+
+
+cells_conditionA <- rownames(seurat@meta.data[which(seurat@meta.data$sample == "conditionA"), ])
+all_genes <- as.character(intersection_genes)
+
+cells_conditionA<- rownames(seurat@meta.data[which(seurat@meta.data$sample == "conditionA"), ])
+cells_conditionB<- rownames(seurat@meta.data[which(seurat@meta.data$sample == "conditionB"), ])
+cells_conditionC<- rownames(seurat@meta.data[which(seurat@meta.data$sample == "conditionC"), ])
+
+for (gene in all_genes){
+
+FeaturePlot(object = seurat, 
+                features.plot = gene, 
+                cells.use = cells_conditionA,
+                do.return=TRUE)[[gene]]
+FeaturePlot(object = seurat, 
+                features.plot = gene, 
+                cells.use = cells_conditionB, 
+                do.return=TRUE)[[gene]]
+FeaturePlot(object = seurat, 
+                features.plot = gene,
+                cells.use = cells_conditionC,
+                do.return=TRUE)[[gene]]
+}
+
+
+```
+**Figure Legend:** *From left to right for each gene are the samples from the conditions: A, B, and C*
+
+## Differentially expressed genes by cell type
+
+The DE genes listed in the tables of top 12 genes for each cell type were filtered to remove the genes present in the majority of analyses and non-protein-coding genes. However, these genes are present in the downloadable results files.
+
+The DE results tables give the following information:
+
+- **Ensembl_id:** Gene Ensembl ID
+- **baseMean:** Mean gene expression across all cells in cluster
+- **LFC-coldvsTN:** Log2 fold change (shrunken) of gene expression for cold cells relative to thermal neutral cells in cluster
+- **SE-coldvsTN:** Standard error of the log2 fold change estimate for cold cells relative to thermal neutral cells in cluster
+- **LFC-coldvsRT:** Log2 fold change (shrunken) of gene expression for cold cells relative to room temperature cells in cluster
+- **SE-coldvsRT:** Standard error of the log2 fold change estimate for cold cells relative to room temperature cells in cluster
+- **LFC-RTvsTN:** Log2 fold change (shrunken) of gene expression for room temperature cells relative to thermal neutral cells in cluster
+- **SE-RTvsTN:** Standard error of the log2 fold change estimate for room temperature cells relative to thermal neutral cells in cluster
+- **stat:** Statistic used for measuring p-value
+- **pvalue:** P-value
+- **padj:** P-value adjusted for multiple test correction
+- **gene_name:** Official gene symbol
+- **gene_biotype:** Type of gene: protein-coding, rRNA, pseudogene, etc.
+- **description:** Full name of gene
+
+_**NOTE:** The results do not describe at which temperatures the gene expression is significantly different. However, the log2 foldchanges can help discern the differences in gene expression across temperature._
+
+## Cluster1
+
+```{r cluster1}
+cluster1_sig_genes <- cluster_sig_results[["cluster1"]]
+cluster1_sig_genes <- cluster1_sig_genes[which(!(cluster1_sig_genes %in% intersection_genes))]
+
+knitr::kable(cluster1_sig_genes[1:12,])
+```
+
+[Download all results for cluster1](results/cluster1_DE_all_results.csv)
+
+[Download significant results for cluster1](results/cluster1_DE_sig_results.csv)
