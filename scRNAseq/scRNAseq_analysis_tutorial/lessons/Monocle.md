@@ -111,14 +111,21 @@ rownames(monocle_annotations) <- monocle_annotations$gene_id
 
 ## Change name of gene symbol column to 'gene_short_name'
 colnames(monocle_annotations)[colnames(monocle_annotations) == "gene_name"] <- "gene_short_name"
-# colnames(select(monocle_annotations, gene_name)) <- "gene_short_name"
 ```
 
 Finally, the order of genes need to match between the features and the counts:
 
 ```r
+# Check if all genes are annotated
+which(!(rownames(raw_counts) %in% rownames(monocle_annotations)))
+
+# Remove genes not annotated
+raw_counts <- raw_counts[which(rownames(raw_counts) %in% rownames(monocle_annotations)), ]
+
 ## Check all of the row names of the annotations match the row names of the counts
 all(rownames(raw_counts) %in% rownames(monocle_annotations))
+
+all(rownames(raw_counts) == rownames(monocle_annotations))
 
 ## If not, then match them
 idx <- match(rownames(raw_counts), rownames(monocle_annotations))
@@ -126,7 +133,7 @@ idx <- match(rownames(raw_counts), rownames(monocle_annotations))
 monocle_annotations <- monocle_annotations[idx, ]
 
 ## Sanity check
-all(rownames(raw_data) == rownames(monocle_annotations))
+all(rownames(raw_counts) == rownames(monocle_annotations))
 ```
 
 Then, we can create the feature data object used to create the `CellDataSet` as an `AnnotatedDataFrame`:
