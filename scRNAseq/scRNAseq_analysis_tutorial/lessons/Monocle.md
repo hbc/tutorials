@@ -110,7 +110,8 @@ Monocle expects the annotations to be formatted with the gene IDs as row names a
 rownames(monocle_annotations) <- monocle_annotations$gene_id
 
 ## Change name of gene symbol column to 'gene_short_name'
-colnames(select(monocle_annotations, gene_name)) <- "gene_short_name"
+colnames(monocle_annotations)[colnames(monocle_annotations) == "gene_name"] <- "gene_short_name"
+# colnames(select(monocle_annotations, gene_name)) <- "gene_short_name"
 ```
 
 Finally, the order of genes need to match between the features and the counts:
