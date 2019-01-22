@@ -21,36 +21,35 @@ library(ensembldb)
 
 ### Using Seurat output
 
-Often pseudotime analysis is performed after performing QC, clustering and marker identification using Seurat. If this is the case, bringing the data into Monocle is quite easy. We can use the `importCDS()` function:
+Often pseudotime analysis is performed after performing QC, clustering and marker identification using Seurat. If this is the case, bringing the data into Monocle is quite easy. The `importCDS()` function is supposed to work, but I have had issues using this if my metadata is for a different number of cells than my raw data:
 
 ```r
 # Read in Seurat object
-seurat_tsne <- readRDS("path/to/seurat_tsne.rds")
+seurat <- readRDS("path/to/seurat.rds")
 
 # Create the 'CellDataSet'
-cds <- importCDS(seurat_tsne)
-```
-
-The feature data slot only has ensembl IDs stored, so if we are to provide the gene symbol, we need to bring in our annotations from our previous analyses or create them again (see end of lesson):
-
-```r
-# Read in the annotations
-annotations <- readRDS("annotations.rds")
-
-# Subset annotations to genes in dataset
-monocle_annotations <- annotations[which(annotations$gene_id %in% rownames(fData(cmv))), ]
-
-# Replace 'gene_short_name' column with gene symbols
-fData(cmv)$gene_short_name <- monocle_annotations$gene_name
+cds <- importCDS(seurat)
 ```
 
 Now we have our data stored as a `CellDataSet` object, and we can proceed through the Monocle workflow.
 
+If this doesn't work for the creation of the object, then we can create the CDS using the metadata and raw counts.
+
 ### Using raw count matrix and metadata objects
 
-Using individual count matrix and metadata objects is a bit more complicated, but still relatively straight-forward. We can create the `CellDataSet` object as follows:
-
 **Step 1:** Read in count matrix - this should only be the filtered cells output from QC
+
+If we have our Seurat object, we can access the different slots in which this data is stored:
+
+```r
+seurat <- readRDS("path/to/seurat.rds")
+
+raw_counts <- seurat@raw.data
+
+metadata <- seurat@meta.data
+```
+
+If no Seurat object, then we can read in the individual count matrix and metadata objects, which is a bit more complicated. 
 
 ```r
 # Bring in count matrix from bcbio
@@ -143,10 +142,10 @@ Then, we can create the feature data object used to create the `CellDataSet` as 
 fd <- new("AnnotatedDataFrame", data = monocle_annotations)
 ```
 
-**Step 3:** Bring in the metadata and create an `AnnotatedDataFrame` to be used to create the `CellDataSet`:
+**Step 3:** Create an `AnnotatedDataFrame` to be used to create the `CellDataSet`:
 
 ```r
-## Read in the metadata
+## Read in the metadata if not already present
 metadata <- read.csv("path/to/metadata.csv")
 
 ## Check that the columns of the counts corresponds to the rows of the metadata
@@ -169,28 +168,28 @@ cds <- newCellDataSet(raw_counts,
 
 > **NOTE:** If the data have UMIs, and it's not an extremely small dataset, then `negbinomial.size()` is the correct option. More details available in the [Monocle docs](http://cole-trapnell-lab.github.io/monocle-release/docs/#choosing-a-distribution-for-your-data-required).
 
-## Using Cell Ranger output
-
-Taken directly from the Monocle documentation: 'If you have 10X Genomics data and are using cellrangerRkit, you can use it to load your data and then pass that to Monocle as follows:'
-
-```r
-cellranger_pipestance_path <- "/path/to/your/pipeline/output/directory"
-gbm <- load_cellranger_matrix(cellranger_pipestance_path)
-
-fd <- fData(gbm)
-
-# The number 2 is picked arbitrarily in the line below.
-# Where "2" is placed you should place the column number that corresponds to your
-# featureData's gene short names.
-
-colnames(fd)[2] <- "gene_short_name"
-
-gbm_cds <- newCellDataSet(exprs(gbm),
-                  phenoData = new("AnnotatedDataFrame", data = pData(gbm)),
-                  featureData = new("AnnotatedDataFrame", data = fd),
-                  lowerDetectionLimit = 0.5,
-                  expressionFamily = negbinomial.size())
-```
+> **NOTE:** ## Using Cell Ranger output
+>
+>Taken directly from the Monocle documentation: 'If you have 10X Genomics data and are using cellrangerRkit, you can use it to load your data and then pass that to Monocle as follows:'
+>
+>```r
+>cellranger_pipestance_path <- "/path/to/your/pipeline/output/directory"
+>gbm <- load_cellranger_matrix(cellranger_pipestance_path)
+>
+>fd <- fData(gbm)
+>
+># The number 2 is picked arbitrarily in the line below.
+># Where "2" is placed you should place the column number that corresponds to your
+># featureData's gene short names.
+>
+>colnames(fd)[2] <- "gene_short_name"
+>
+>gbm_cds <- newCellDataSet(exprs(gbm),
+>                  phenoData = new("AnnotatedDataFrame", data = pData(gbm)),
+>                  featureData = new("AnnotatedDataFrame", data = fd),
+>                  lowerDetectionLimit = 0.5,
+>                  expressionFamily = negbinomial.size())
+>```
 
 ## Estimating size factors and dispersions
 
