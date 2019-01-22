@@ -49,7 +49,7 @@ raw_counts <- seurat@raw.data
 metadata <- seurat@meta.data
 ```
 
-If no Seurat object, then we can read in the individual count matrix and metadata objects, which is a bit more complicated. 
+If no Seurat object, then we can read in the individual count matrix and metadata objects: 
 
 ```r
 # Bring in count matrix from bcbio
