@@ -24,7 +24,7 @@ set.seed(1454944673L)
 
 opts_chunk[["set"]](
     audodep = TRUE,
-    cache = TRUE,
+    cache = FALSE,
     cache.lazy = FALSE,
     error = TRUE,
     echo = FALSE,
@@ -34,13 +34,6 @@ opts_chunk[["set"]](
     message = FALSE,
     tidy = TRUE,
     warning = TRUE
-)
-
-theme_set(
-    theme_paperwhite(
-        base_size = 14L,
-        legend_position = "bottom"
-    )
 )
 ```
 
@@ -111,6 +104,12 @@ raw_counts <- raw_counts[-c(duplicated_ids), ]
 
 gene_symbols <- gene_symbols[-c(duplicated_ids), ]
 
+raw_counts <- raw_counts[which(rownames(raw_counts) %in% gene_symbols$Row.names), ]
+
+gene_symbols <- gene_symbols[which(gene_symbols$Row.names %in% rownames(raw_counts)), ]
+
+# all(gene_symbols$Row.names == rownames(raw_counts))
+
 rownames(raw_counts) <- gene_symbols$gene_name
 
 #write.csv(as.matrix(raw_counts), "data/raw_counts_symbols.csv")
@@ -137,37 +136,36 @@ metadata$nGene <- Matrix::colSums(counts > 0)
 metadata$log10GenesPerUMI <- log10(metadata$nGene) / log10(metadata$nUMI)
 
 # Add sample name
-CD45_0325 <- which(str_detect(metadata$cells, "run1_ATAGAGAG"))
-CD45_CD14_0425 <- which(str_detect(metadata$cells, "run1_ATTAGACG"))
-CD45_CD14_0325 <- which(str_detect(metadata$cells, "run1_CTCCTTAC"))
-CD45_0425 <- which(str_detect(metadata$cells, "run1_TACTCCTT"))
+sample1 <- which(str_detect(metadata$cells, "run1_ATAGAGAG"))
+sample2 <- which(str_detect(metadata$cells, "run1_ATTAGACG"))
+sample3 <- which(str_detect(metadata$cells, "run1_CTCCTTAC"))
+sample4 <- which(str_detect(metadata$cells, "run1_TACTCCTT"))
 
 metadata$sample <- "x"
-metadata$sample[CD45_0325] <- "CD45_0325"
-metadata$sample[CD45_CD14_0425] <- "CD45_CD14_0425"
-metadata$sample[CD45_CD14_0325] <- "CD45_CD14_0325"
-metadata$sample[CD45_0425] <- "CD45_0425"
+metadata$sample[sample1] <- "Good name for sample1"
+metadata$sample[sample2] <- "Good name for sample2"
+metadata$sample[sample3] <- "Good name for sample3"
+metadata$sample[sample4] <- "Good name for sample4"
 #which(metadata$sample == "x")
 
 # Get the total number of reads per sample
-nReads_CD45_0325 <- read_tsv("path/to/final/run1-ATAGAGAG/run1-ATAGAGAG-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
+nReads_sample1 <- read_tsv("path/to/final/run1-ATAGAGAG/run1-ATAGAGAG-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
         mutate(cell = make.names(cell)) %>%
-        mutate(sample = "CD45_0325")
+        mutate(sample = "Good name for sample1")
 
-nReads_CD45_CD14_0425 <- read_tsv("path/to/final/run1-ATTAGACG/run1-ATTAGACG-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
+nReads_sample2 <- read_tsv("path/to/final/run1-ATTAGACG/run1-ATTAGACG-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
         mutate(cell = make.names(cell)) %>%
-        mutate(sample = "CD45_CD14_0425")
+        mutate(sample = "Good name for sample2")
 
-nReads_CD45_CD14_0325 <- read_tsv("path/to/final/run1-CTCCTTAC/run1-CTCCTTAC-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
+nReads_sample3 <- read_tsv("path/to/final/run1-CTCCTTAC/run1-CTCCTTAC-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
         mutate(cell = make.names(cell)) %>%
-        mutate(sample = "CD45_CD14_0325")
+        mutate(sample = "Good name for sample3")
 
-
-nReads_CD45_0425 <- read_tsv("path/to/final/run1-TACTCCTT/run1-TACTCCTT-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
+nReads_sample1 <- read_tsv("path/to/final/run1-TACTCCTT/run1-TACTCCTT-barcodes.tsv", col_names = c("cell", "nReads"))  %>% 
         mutate(cell = make.names(cell)) %>%
-        mutate(sample = "CD45_0425")
+        mutate(sample = "Good name for sample4")
 
-nReads <- rbind(nReads_CD45_0325, nReads_CD45_CD14_0425, nReads_CD45_CD14_0325, nReads_CD45_0425)
+nReads <- rbind(nReads_sample1, nReads_sample2, nReads_sample3, nReads_sample4)
 
 nReads$nReads <- log10(nReads$nReads)
 ```
