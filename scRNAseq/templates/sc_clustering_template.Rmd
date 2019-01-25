@@ -427,8 +427,13 @@ write_rds(seurat, "data/seurat_tsne.rds")
 
 Based on these markers, the following are the hypothesized identities of the clusters:
 
-|:---:|:---:|
 | Cluster | Cell type |
+|:---:|:---:|
+| 0 | Cell type |
+| 1 | Cell type |
+| 2 | Cell type |
+| 3 | Cell type |
+| 4 | Cell type |
 
 
 ```{r new_ids}
