@@ -1,0 +1,145 @@
+---
+title: "Power analysis of scRNA-seq experiment"
+author: ""
+date: "`r Sys.Date()`"
+output:
+        html_document:
+                toc: true
+                toc_float: true
+                collapsed: true
+                toc_depth: 2
+                theme: paper
+---
+
+```{r setup, cache=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+# Load libraries
+library(Seurat)
+library(knitr)
+library(rmarkdown)
+library(tidyverse)
+library(Matrix)
+library(AnnotationHub)
+library(ensembldb)
+library(scales)
+library(SingleCellExperiment)
+
+# Set seed for reproducibility
+set.seed(1454944673L)
+opts_chunk[["set"]](
+    audodep = TRUE,
+    cache = FALSE,
+    cache.lazy = FALSE,
+    error = TRUE,
+    echo = FALSE,
+    fig.height = 10L,
+    fig.retina = 2L,
+    fig.width = 10L,
+    message = FALSE,
+    tidy = TRUE,
+    warning = TRUE
+)
+
+```
+
+# Power analysis
+
+Power analyses were performed to determine the number of samples needed to identify differentially expressed genes between `samplegroup1` and `samplegroup2` given a false positive rate of 0.05 (alpha) and a false negative rate of 0.1 or 0.2 (80% or 90% power).
+
+For single-cell analyses with multiple biological replicates, differential expression analysis can be performed by summing the single cells for each gene to the sample level for the cell type of interest [[1](https://goo.gl/hWpXQF)]. Therefore, to determine the number of required biological replicates needed to achieve a specific power to detect differentially expressed genes for a given effect size, the single cells are collapsed to the sample level to perform a pseudo-bulk power analysis.
+
+To perform the power analysis, the power was calculated by calculating the average number of counts per gene in the cell type population of interest and exploring a range of effect sizes using the RNASeqPower package in R [[2](https://www.bioconductor.org/packages/release/bioc/vignettes/RNASeqPower/inst/doc/samplesize.pdf)]. With the pilot analysis containing a single patient sample, we cannot calculate the biological coefficient of variation (CV); however, within group CV has been found to be less than 0.4 for a range of human studies in bulk RNA-seq [[3](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3842884/)]. Since single-cell RNA-seq analyses have additional variation, we will use a stringent CV, set to 0.5. It is likely a conservative estimate of variability between patients, but we will be able to better estimate the the variability after sequencing additional patients.
+
+Our cell population of most interest is `celltype`. We performed the power calculation for this population first. Below are the sample sizes needed for 80% and 90% power and a range of effect sizes given on the left:
+
+```{r power_analysis, message=FALSE, warning=FALSE}
+# Load library for power analysis
+library(RNASeqPower)
+library(basejump)
+
+# Bring in clustering information
+seurat_tsne <- readRDS("path/to/seurat.rds")
+
+metadata <- seurat_tsne@meta.data
+metadata$ident <- seurat_tsne@ident
+
+# Subset cells to cluster of interest
+# Example Monocyte cells
+
+cellIDs_monocytes <- rownames(metadata[metadata$ident == "Monocytes", ])
+monocyte_counts <- seurat_tsne@raw.data[, cellIDs_monocytes]
+#all(cellIDs_monocytes %in% colnames(monocyte_counts))
+
+# Determine average number of reads per gene for each sample
+total_gene_reads <- rowSums(as.matrix(monocyte_counts))
+avg_gene_reads <- geometricMean(total_gene_reads)
+
+# Determine the biological coefficient of variation
+## If only a single sample and can't estimate, use bcv of 0.5
+bcv <- 0.5
+
+## If more than a single sample:
+
+library(edgeR)
+edgeR_dgelist <- DGEList(counts=monocyte_counts, group=condition))
+edgeR_dgelist <- calcNormFactors(edgeR_dgelist, method = "TMM")
+edgeR_dgelist <- estimateCommonDisp(edgeR_dgelist)
+bcv <- sqrt(edgeR_dgelist$common.dispersion) 
+
+# Run the power analysis
+power_table <- rnapower(depth=avg_gene_reads,
+                        cv=bcv, 
+                        effect=c(1.5, 1.75, 2),
+                        alpha= .05, 
+                        power=c(.8, .9))
+knitr::kable(power_table)
+```
+
+To achieve 80% power for identifying of genes differentially expressed between `samplegroup1` and `samplegroup2` monocytes by at least 2-fold would require x replicates per sample group. If we wanted to achieve 90% power, then we would require x replicates. Similarly, if we preferred to identify DE genes with 1.75-fold differences in expression, then we would need at least x replicates for 80% power and x replicates for 90% power. 
+
+Since monocytes are one of the larger cell populations we could explore with 9,674 cells, we could also test one of the smaller cell populations. 
+
+```{r cell_pop}
+cell_freqs <- data.frame(sort(table(metadata_all$ident), decreasing = TRUE))
+colnames(cell_freqs) <- c("Cell type", "Number of cells")
+knitr::kable(cell_freqs)
+```
+
+For the T cells with x cells, we can perform the same power analysis:
+
+```{r power_analysis_Tcells, message=FALSE, warning=FALSE}
+# Load library for power analysis
+# Subset cells to cluster of interest
+# Example T cells
+
+cellIDs_Tcells <- rownames(metadata[metadata$ident == "T cells", ])
+Tcells_counts <- seurat_tsne@raw.data[, cellIDs_Tcells]
+#all(cellIDs_Tcells %in% colnames(Tcells_counts))
+
+# Determine average number of reads per gene for each sample
+total_gene_reads <- rowSums(as.matrix(Tcells_counts))
+avg_gene_reads <- geometricMean(total_gene_reads)
+
+# Determine the biological coefficient of variation
+## Since only a single sample and can't estimate, use bcv of 0.5
+bcv <- 0.5
+
+# Run the power analysis
+power_table <- rnapower(depth=avg_gene_reads,
+                        cv=bcv, 
+                        effect=c(1.5, 1.75, 2),
+                        alpha= .05, 
+                        power=c(.8, .9))
+knitr::kable(power_table)
+```
+
+With the fewer number of cells, we would need more samples to detect differences in expression between the groups. For 80% power, we would need x replicates to detect an effect size of 2 and x replicates to detect an effect size of 1.75.
+
+**References:**
+
+1. H.M. Kang, M. Subramaniam, S. Targ, M. Nguyen, L. Maliskova, E. Wan, S. Wong, L. Byrnes, C. Lanata, R. Gate, et al. Multiplexing droplet-based single cell RNA-sequencing using natural genetic barcodes. Nature Biotechnology (2018), 36:89–94. Doi: 10.1038/nbt.4042  
+
+2. Terry Therneau, Steven Hart and Jean-Pierre Kocher (2019). Calculating
+  samplesSize estimates for RNA Seq studies. R package version 1.22.1.
+  
+3. Hart SN, Therneau TM, Zhang Y, Poland GA, Kocher JP. Calculating sample size estimates for RNA sequencing data. J Comput Biol. (2013), 12:970-8. Doi: 10.1089/cmb.2012.0283. 
