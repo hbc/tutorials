@@ -23,6 +23,8 @@ This repository contains tutorials for how to perform each part of a single-cell
   - DE analysis report (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_DESeq2_analysis_report_template.Rmd))
 - Differential expression analysis with EdgeR
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
+- Monocle trajectory analysis (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/))
+- Power analysis (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/))
 
 ### Analysis workflow with bcbioSingleCell [last update: 2017]
 
