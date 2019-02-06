@@ -203,7 +203,7 @@ cds <- estimateSizeFactors(cds)
 cds <- estimateDispersions(cds)
 ```
 
-# Additional QC suggested by Monocle
+## Additional QC suggested by Monocle
 
 The Monocle tutorial suggests filtering low quality cells for minimum expression levels and for doublets. We likely have already performed the filtering for minimum expression during the original QC, but the doublet filtering has not been performed. Evidently, the trajectory analysis is quite sensitive to the presence of doublets. Moving forward we may consider different tools to perform this filtering.
 
@@ -318,7 +318,7 @@ pie + coord_polar(theta = "y") +
 subset(pData(cmv), CellType == "pDCs")
 ```
 
-## Identify clustering genes using 'Unsupervised' method
+## Identify clustering genes using an 'Unsupervised' method
 
 Now we can try to assign identity to the 'Unknown' cells by using the prinicipal components that explain the largest amount of variance in the data, somewhat similar to Seurat's method.
 
@@ -374,3 +374,97 @@ plot_cell_clusters(cmv, 1, 2, color = "Cluster") +
  ```
  
 ## Further identify clustering genes using a 'Supervised' method
+
+While the unsupervised clustering method allowed for using genes that were more highly expressed and variable for determining the principal components to use for clustering, the supervised method will instead choose genes that co-vary with the cell type markers given. After identifying the genes that co-vary signficantly with the cell type markers, we will select genes with high specificity; usually it's best to pick the top 10 or 20 genes most specific per cell type.
+
+```r
+# Identify ordering genes - supervised method
+
+# Identifying genes that co-vary with markers
+marker_diff <- markerDiffTable(cmv[expressed_genes,],
+            cth,
+            residualModelFormulaStr = "~ condition + num_genes_expressed",
+            cores = 1)
+
+# Selecting the genes that significantly co-vary
+candidate_clustering_genes <-
+    row.names(subset(marker_diff, qval < 0.01))
+
+# Determine specificity of the markers
+marker_spec <- calculateMarkerSpecificity(cmv[candidate_clustering_genes,], cth)
+
+head(selectTopMarkers(marker_spec, 3))
+```
+
+Now we can use these specific markers to cluster the cells. We will pick the top 500 markers for each cell type (although I am unsure why the choice is 500 here and not the 10-20 genes mentioned previously. We determine the unique top 500 specific markers for each cluster, then mark the genes 
+```r
+# Select the specific cell type genes to use
+semisup_clustering_genes <- unique(selectTopMarkers(marker_spec, 500)$gene_id)
+
+# Mark that these are the genes to be used for clustering 
+cmv <- setOrderingFilter(cmv, semisup_clustering_genes)
+
+# Explore the variance explained by the genes
+plot_ordering_genes(cmv)
+
+plot_pc_variance_explained(cmv, return_all = F)
+
+# Use these genes for the clustering
+cmv <- reduceDimension(cmv, max_components = 2, num_dim = 9,
+  norm_method = 'log',
+  reduction_method = 'tSNE',
+  residualModelFormulaStr = "~ condition + num_genes_expressed",
+  verbose = T)
+ 
+# Cluster the genes similar to previously
+cmv <- clusterCells(cmv, num_clusters = 15)
+
+# Explore the clustering
+plot_cell_clusters(cmv, 1, 2, color = "CellType",
+    markers = c("CD14", "CD36", "CD3D", "CD8A", "CD4", "CD19"))
+    
+plot_cell_clusters(cmv, 1, 2, color = "Cluster") +
+    facet_wrap(~CellType)
+```
+
+## Imputing cell types
+
+For those cells that are still of 'Unknown' cell type, we can impute the identity based on the expression of markers from the other cells in that cluster. We will impute the identities of the 'Unknown' cells using a threshold of 10% for the percentage of cluster marked as a certain type of cell to impute the values of the remaining cells.
+
+```r
+# Impute cell type
+imputed <- clusterCells(cmv,
+              num_clusters = 15,
+              frequency_thresh = 0.1,
+              cell_type_hierarchy = cth)
+              
+plot_cell_clusters(imputed, 1, 2, color = "CellType",
+    markers = c("CD14", "CD36", "CD3D", "CD8A", "CD4", "CD19"))
+    
+pie <- ggplot(pData(imputed),
+              aes(x = factor(1), fill = factor(CellType))) + geom_bar(width = 1)
+
+pie + coord_polar(theta = "y") +
+        theme(axis.title.x = element_blank(), axis.title.y = element_blank())
+
+table(pData(imputed)$CellType)
+```
+
+## Trajectory analysis
+
+To perform trajectory analysis, you will need to subset out the cells of interest from your object. In this example, I'm interested in monocytes.
+
+```r
+# Subset out monocytes
+monocyte_cells <- row.names(subset(pData(imputed), CellType == "Monocytes"))
+
+monocytes <- imputed[ , monocyte_cells]
+
+dim(monocytes)
+```
+
+```r
+# Trajectory analysis
+monocytes <- detectGenes(monocytes, min_expr = 0.1)
+
+```
