@@ -203,11 +203,63 @@ cds <- estimateSizeFactors(cds)
 cds <- estimateDispersions(cds)
 ```
 
+# Additional QC suggested by Monocle
+
+The Monocle tutorial suggests filtering low quality cells for minimum expression levels and for doublets. We likely have already performed the filtering for minimum expression during the original QC, but the doublet filtering has not been performed. Evidently, the trajectory analysis is quite sensitive to the presence of doublets. Moving forward we may consider different tools to perform this filtering.
+
+```r
+# Additional filtering of low quality cells
+
+# Removing lowly expressed genes
+cds <- detectGenes(cds, min_expr = 0.1)
+
+# Removing genes not expressed in at least 10 cells
+expressed_genes <- row.names(subset(fData(cds), num_cells_expressed >= 10))
+
+# Removing cells that may be doublets
+pData(cds)$Total_mRNAs <- Matrix::colSums(exprs(cds))
+
+cds <- cds[,pData(cds)$Total_mRNAs < 1e6]
+
+upper_bound <- 10^(mean(log10(pData(cds)$Total_mRNAs)) +
+            2*sd(log10(pData(cds)$Total_mRNAs)))
+lower_bound <- 10^(mean(log10(pData(cds)$Total_mRNAs)) -
+            2*sd(log10(pData(cds)$Total_mRNAs)))
+
+qplot(Total_mRNAs, data = pData(cds), color = viralLoad, geom =
+"density") +
+geom_vline(xintercept = lower_bound) +
+geom_vline(xintercept = upper_bound)
+
+cds <- cds[,pData(cds)$Total_mRNAs > lower_bound &
+      pData(cds)$Total_mRNAs < upper_bound]
+cds <- detectGenes(cds, min_expr = 0.1)
+```
+
+After performing the filtering, it is suggested to check the data to ensure the counts follow an approximate log-normal scale.
+
+```r
+# Check expression to make sure filtered counts follow approximate log-normal distribution
+
+# Log-transform each value in the expression matrix.
+L <- log(exprs(cds[expressed_genes,]) + 1)
+
+# Standardize each gene, so that they are all on the same scale,
+# Then melt the data with plyr so we can plot it easily
+melted_dens_df <- melt(Matrix::t(scale(Matrix::t(L))))
+
+# Plot the distribution of the standardized gene expression values.
+qplot(value, geom = "density", data = melted_dens_df) +
+stat_function(fun = dnorm, size = 0.5, color = 'red') +
+xlab("Standardized log(norm_counts)") +
+ylab("Density")
+```
+
 Now we are ready for classifying cells by cell type. 
 
 ## Cell classification
 
-Monocle uses a bit different method for clustering cells by taking in known marker genes to aid with clustering and identification of cell type.
+Monocle uses a bit different method for clustering cells by taking in known marker genes to aid with clustering and identification of cell type. We need to provide Monocle with the gene IDs for the marker genes of the different clusters.
 
 For example, if working with immune cells, we could have identified good cell markers for our dataset with Seurat previously:
 
@@ -266,28 +318,59 @@ pie + coord_polar(theta = "y") +
 subset(pData(cmv), CellType == "pDCs")
 ```
 
-# Unsupervised cell clustering
+## Identify clustering genes using 'Unsupervised' method
 
-To perform clustering of the cells, we need to obtain the gene IDs for the genes that are expressed and the dispersions for these genes.
-
-Then, we can identify those genes that have higher expression and dispersion values to use in the initial round of clustering.
+Now we can try to assign identity to the 'Unknown' cells by using the prinicipal components that explain the largest amount of variance in the data, somewhat similar to Seurat's method.
 
 ```r
-# Create column in fData with the number of cells expressed per gene
-cmv <- detectGenes(cmv, min_expr = 1)
+# Assign celltype to Unknown cells
+disp_table <- dispersionTable(cmv)
 
-# Get the gene IDs for the genes that are expressed in more than 10 cells
-expressed_genes <- row.names(subset(fData(cmv),
-                                    num_cells_expressed >= 10))
+# Identify ordering genes - unsupervised clustering
 
-# Extract the gene-wise dispersion values                                   
-disp_table <- dispersionTable(cmv) 
+## Subset those genes with expression higher than 0.1
+unsup_clustering_genes <- subset(disp_table, mean_expression >= 0.1)
 
-# Return genes to use for unsupervised clustering by subsetting to genes with higher expression and dispersion
-unsup_clustering_genes <- subset(disp_table,
-                                 mean_expression >= 0.1) 
-                                 
-# Create column to denote whether to use gene to cluster cells
-cmv <- setOrderingFilter(cmv, 
-                         unsup_clustering_genes$gene_id)                                                                   
+## Mark genes to be used for clustering
+cmv <- setOrderingFilter(cmv, unsup_clustering_genes$gene_id)
+
+## View genes to be used for clustering
+plot_ordering_genes(cmv)
+
+## Determine number of principal components to use based on where elbow meets the surface
+# x11(type="cairo") # Run if error viewing the following plot
+plot_pc_variance_explained(cmv, return_all = F) # norm_method='log'
 ```
+
+Now we can perform the dimensionality reduction using the identified principal components and the tSNE method. You will need to choose the number of clusters to return; I randomly chose 15 clusters, but you could choose more or less based on expectations. If you choose more, than expected, you can always merge together later on in the analysis. Also, we need to choose the number of dimensions to use, which should be based on analysis of the Elbow (skree) plot where the elbow just seems to touch the base.
+
+```r
+## Reduce dimensions for tSNE viewing with max components of 2 and number of dimensions equal to the PCs determined in elbow plot
+cmv <- reduceDimension(cmv, max_components = 2, num_dim = 9,
+                reduction_method = 'tSNE', verbose = T)
+
+## Cluster the cells to a certain number of clusters - will limit # clusters returned - randomly chose 15, but may return less                
+cmv <- clusterCells(cmv, num_clusters = 15)
+```
+
+Let's explore the quality of our clustering by checking our known markers:
+
+```r
+## Explore cluster assignment
+head(pData(cmv))
+
+plot_cell_clusters(cmv, 1, 2, color = "CellType",
+    markers = c("CD14", "CD36", "CD3D", "CD8A", "CD4", "CD19"))
+    
+cmv <- reduceDimension(cmv, max_components = 2, num_dim = 9,
+            reduction_method = 'tSNE',
+            residualModelFormulaStr = "~ condition + num_genes_expressed",
+            verbose = T)
+
+cmv <- clusterCells(cmv, num_clusters = 15)
+
+plot_cell_clusters(cmv, 1, 2, color = "Cluster") +
+    facet_wrap(~CellType)
+ ```
+ 
+## Further identify clustering genes using a 'Supervised' method
