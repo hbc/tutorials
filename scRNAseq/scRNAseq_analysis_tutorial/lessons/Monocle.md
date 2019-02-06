@@ -462,9 +462,81 @@ monocytes <- imputed[ , monocyte_cells]
 
 dim(monocytes)
 ```
+Now, we can order cells based on genes that differ between clusters using the 'dpFeature' unsupervised method after selecting a subset of genes expressed in 5% of the cells.
 
 ```r
 # Trajectory analysis
+# This filtering should have already be performed, so probably not necessary
 monocytes <- detectGenes(monocytes, min_expr = 0.1)
+
+# Selecting the genes expressed in 5% of cells
+fData(monocytes)$use_for_ordering <- fData(monocytes)$num_cells_expressed > 0.05 * ncol(monocytes)
+```
+
+After determining the genes to use for the ordering of cells for the trajectory analysis, we can perform PCA analysis to identify the variance explained by each PC and choose the number of dimensions to include in the TSNE reduction based on where the elbow approaches the base.
+
+```r
+# Elbow or scree plot
+plot_pc_variance_explained(monocytes, return_all = F)
+    
+# Only include highest PCs with large gaps following components
+monocytes <- reduceDimension(monocytes,
+                              max_components = 2,
+                              norm_method = 'log',
+                              num_dim = 6,
+                              reduction_method = 'tSNE',
+                              verbose = T)
+```
+
+The next step involves the density peak clustering, which clusters the cells based on the cell's local density. It is explained by monocle as: "The densityPeak algorithm clusters cells based on each cell's local density (Ρ) and the nearest distance (Δ) of a cell to another cell with higher distance. We can set a threshold for the Ρ, Δ and define any cell with a higher local density and distance than the thresholds as the density peaks. Those peaks are then used to define the clusters for all cells. By default, clusterCells choose 95% of Ρ and Δ to define the thresholds. We can also set a number of clusters (n) we want to cluster. In this setting, we will find the top n cells with high Δ with Δ among the top 50% range. The default setting often gives good clustering."
+
+```r
+# Perform the density peak clustering
+monocytes <- clusterCells(monocytes, verbose = F)
+```
+We can explore the clustering using the `plot_cell_clusters()` function:
+
+```r
+# Plotting the clusters to explore clustering
+plot_cell_clusters(monocytes, color_by = 'as.factor(Cluster)')
+plot_cell_clusters(monocytes, color_by = 'as.factor(condition)')
+```
+
+Then we want to identify the genes that are differentially expressed between the beginning and end of our process/time/condition. We can perform the differential expression and adding the time/condition that is changing to the model.
+
+```r
+# Subsetting the genes to only those genes expressed in at least 10 cells within this monocyte subset
+mono_expressed_genes <-  row.names(subset(fData(monocytes),
+num_cells_expressed >= 10))
+
+# Performing the DE gene test
+clustering_DEG_genes <-
+    differentialGeneTest(monocytes[mono_expressed_genes,],
+          fullModelFormulaStr = '~ Cluster',
+          cores = 1)
+
+# Select the top 1000 most significant genes
+mono_ordering_genes <-
+    row.names(clustering_DEG_genes)[order(clustering_DEG_genes$qval)][1:1000]
+```
+
+Through the differential expression test we have identitified the genes that will be used for ordering our cells along a trajectory. We now need to set them in the 'CellDataSet' object (`monocytes`), then reduce the dimensions to 2 for viewing and perform the ordering of the cells along the trajectory.
+
+```r
+
+monocytes <-
+    setOrderingFilter(monocytes,
+        ordering_genes = mono_ordering_genes)
+
+monocytes <-
+    reduceDimension(monocytes, method = 'DDRTree')
+
+monocytes <-
+    orderCells(monocytes)
+
+monocytes <-
+    orderCells(monocytes, root_state = GM_state(monocytes))
+
+plot_cell_trajectory(monocytes, color_by = "viralLoad")
 
 ```
