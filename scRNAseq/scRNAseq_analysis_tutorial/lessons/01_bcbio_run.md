@@ -108,7 +108,35 @@
 	>**NOTE:** `awk 'NR % 4 == 2'` gets every 4th line starting from the 2nd, which is a useful trick when you want to count up FASTQ file entries (Rory's code)
 
 	The reverse complement sequences of the sample indices given by the client should correspond to the most abundant indices in the file.
+
+	**Automatization**
 	
+	Alternatively, you can use this [script](https://gist.github.com/lpantano/2a8d5b14fa6f5df7be3b68c006ef729d) to make a list of top N barcodes and match them with a list provided in a CSV file:
+	
+	```
+	python check_sc_barcode.py --fastq FILE_R3.fastq.gz --barcodes barcodes.csv
+	```
+	
+	It needs python3 and biopython (for people on O2 python is available at `/n/app/bcbio/conda3/bin/python` and the script at `/n/app/bcbio/scripts/check_sc_barcode.py`).
+	
+	The **barcode.csv** file looks like this:
+	
+	```
+	CTATTAAG,M3L_Basal amygdala
+	AAGGCTAT,M2_BA25_1
+	GAGCCTTA,M3R_BA25
+	TTATGCGA,M3L_BA25
+	```
+	
+	The output will look like this:
+	
+	```
+	This barcode CTTAATAG has not been detected.
+	This barcode ATAGCCTT has not been detected.
+	This barcode TAAGGCTC (M2_BA25 2) is detected with 1394 reads.
+	This barcode AGATCTCG is not in your list (2893 reads).
+	```
+
 7. Use the `cat` command to concatenate all of the files for a given sample across lanes:
 
 	```
