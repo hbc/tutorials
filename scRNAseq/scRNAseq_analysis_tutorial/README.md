@@ -12,7 +12,7 @@ This repository contains tutorials for how to perform each part of a single-cell
 
 ### Analysis workflow with Seurat (version 3)
 repo in development at https://github.com/hbctraining/scRNA-seq/tree/master/lessons - the code is complete, but the lessons will be fully reviewed by mid-July
-- [scRNA-seq background material](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/SC_pre-QC.md
+- [scRNA-seq background material](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/SC_pre-QC.md)
 - [Quality control analysis](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/modified_SC_quality_control.md)
 - [Clustering analysis](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/SC_clustering_analysis.md)
 - [Marker identification analysis](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/SC_marker_identification.md)
