@@ -16,7 +16,7 @@ repo in development at https://github.com/hbctraining/scRNA-seq/tree/master/less
 - [Quality control analysis](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/modified_SC_quality_control.md)
 - [Clustering analysis](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/SC_clustering_analysis.md)
 - [Marker identification analysis](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/SC_marker_identification.md)
-- [Integration analysis through marker identification](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/SC_clustering_analysis_integration.md
+- [Integration analysis through marker identification](https://github.com/hbctraining/scRNA-seq/blob/master/lessons/SC_clustering_analysis_integration.md)
 
 ### Analysis workflow with Seurat (version 2)
 
