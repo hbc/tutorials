@@ -34,7 +34,9 @@ repo in development at https://github.com/hbctraining/scRNA-seq/tree/master/less
   - Pseudobulk - see Meeta
 - Differential expression analysis with MAST - see Victor
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
-- [Monocle trajectory analysis](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/Monocle.md) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/))
+- Trajectory analysis
+  - [Monocle](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/Monocle.md) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/))
+  - Slingshot - see Rory
 - Power analysis (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/))
 
 ### Analysis workflow with bcbioSingleCell [last update: 2017]
