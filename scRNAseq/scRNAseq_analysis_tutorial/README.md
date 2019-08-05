@@ -12,11 +12,16 @@ This repository contains tutorials for how to perform each part of a single-cell
 
 ### Analysis workflow with Seurat (version 3)
 All steps can be found in the teaching team repo: https://hbctraining.github.io/scRNA-seq/schedule/.
+- [Quality control analysis](https://hbctraining.github.io/scRNA-seq/lessons/03_SC_quality_control.html)
+- [Clustering analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_clustering_analysis.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_clustering_template.Rmd))
+- [Marker identification analysis](https://hbctraining.github.io/scRNA-seq/lessons/07_SC_marker_identification.html)
+- [Integration - clustering](https://hbctraining.github.io/scRNA-seq/lessons/08_SC_clustering_analysis_integration.html)
+- [Integration - marker id](https://hbctraining.github.io/scRNA-seq/lessons/09_SC_marker_identification_integration.html)
 
 ### Analysis workflow with Seurat (version 2)
 
 - [Quality control analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_quality_control_analysis.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_QC_template.Rmd))
-- [Clustering analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_clustering_analysis.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_clustering_template.Rmd))
+- [Clustering analysis](https://hbctraining.github.io/scRNA-seq/lessons/05_SC_clustering_cells.html)
 - [Marker identification analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_marker_identification.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_marker_identification_template.Rmd))
 
 
