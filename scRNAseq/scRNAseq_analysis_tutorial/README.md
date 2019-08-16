@@ -13,7 +13,8 @@ This repository contains tutorials for how to perform each part of a single-cell
 ### Analysis workflow with Seurat (version 3)
 All steps can be found in the teaching team repo: https://hbctraining.github.io/scRNA-seq/schedule/.
 - [Quality control analysis](https://hbctraining.github.io/scRNA-seq/lessons/03_SC_quality_control.html)
-- [Clustering analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_clustering_analysis.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_clustering_template.Rmd))
+- [Clustering analysis](https://hbctraining.github.io/scRNA-seq/lessons/05_SC_clustering_cells.html) 
+- [Cluster exploration](https://hbctraining.github.io/scRNA-seq/lessons/06_SC_clustering_quality_control.html)
 - [Marker identification analysis](https://hbctraining.github.io/scRNA-seq/lessons/07_SC_marker_identification.html)
 - [Integration - clustering](https://hbctraining.github.io/scRNA-seq/lessons/08_SC_clustering_analysis_integration.html)
 - [Integration - marker id](https://hbctraining.github.io/scRNA-seq/lessons/09_SC_marker_identification_integration.html)
@@ -28,16 +29,16 @@ All steps can be found in the teaching team repo: https://hbctraining.github.io/
 ### Downstream analyses
 - Differential expression analysis with DESeq2
   - Pseudobulk - see Meeta
-  - [Deprecated] Preparation of data for DE analysis with DESeq2 (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_prep_for_DESeq2_analysis.Rmd))
-  - [Deprecated] DE analysis report (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_DESeq2_analysis_report_template.Rmd))
 - Differential expression analysis with EdgeR
   - Pseudobulk - see Meeta
 - Differential expression analysis with MAST - see Victor
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
 - Trajectory analysis
-  - [Monocle](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/Monocle.md) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/))
+  - [Monocle](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/Monocle.md) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/)) - needs some work
   - Slingshot - see Rory
 - Power analysis (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/))
+  - [Deprecated] Preparation of data for DE analysis with DESeq2 (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_prep_for_DESeq2_analysis.Rmd))
+  - [Deprecated] DE analysis report (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_DESeq2_analysis_report_template.Rmd))
 
 ### Analysis workflow with bcbioSingleCell [last update: 2017]
 
