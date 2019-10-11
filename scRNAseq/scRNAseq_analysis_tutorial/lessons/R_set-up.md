@@ -15,6 +15,9 @@ We should specify the R library to use in our `~/.Renviron` file. You can either
 Within the same file, it will help to set the `R_MAX_NUM_DLLS` variable to a high number in order to use many of the single cell packages. I have mine set to `200`, which has worked so far.
 
 ```r
+# Library using R 3.6.1 with Seurat 3.1+
+R_LIBS_USER="/n/data1/cores/bcbio/R/library/3.6.1-bioc-release/library"
+
 # Library using R 3.5.1 with Seurat 3.0
 R_LIBS_USER="/n/data1/cores/bcbio/R/library/3.5.1-bioc-release_Seurat3.0"
 
