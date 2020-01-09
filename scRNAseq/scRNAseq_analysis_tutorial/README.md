@@ -34,7 +34,7 @@ All steps can be found in the teaching team repo: https://hbctraining.github.io/
 - Trajectory analysis
   - Slingshot - see Rory
 - Power analysis 
-  - [Current] Associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/))
+  - [Current] Associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/)
   - [Deprecated] Preparation of data for DE analysis with DESeq2 (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_prep_for_DESeq2_analysis.Rmd)) - Needs to be changed to pseudobulk analysis
   - [Deprecated] DE analysis report (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_DESeq2_analysis_report_template.Rmd)) - Needs to be changed to pseudobulk analysis
 
