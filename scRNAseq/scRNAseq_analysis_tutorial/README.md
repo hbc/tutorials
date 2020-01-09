@@ -11,13 +11,7 @@ This repository contains tutorials for how to perform each part of a single-cell
 - [R on O2](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/R_set-up.md)
 
 ### Analysis workflow with Seurat (version 3)
-All steps can be found in the teaching team repo: https://hbctraining.github.io/scRNA-seq/schedule/.
-- [Quality control analysis](https://hbctraining.github.io/scRNA-seq/lessons/03_SC_quality_control.html)
-- [Clustering analysis](https://hbctraining.github.io/scRNA-seq/lessons/05_SC_clustering_cells.html) 
-- [Cluster exploration](https://hbctraining.github.io/scRNA-seq/lessons/06_SC_clustering_quality_control.html)
-- [Marker identification analysis](https://hbctraining.github.io/scRNA-seq/lessons/07_SC_marker_identification.html)
-- [Integration - clustering](https://hbctraining.github.io/scRNA-seq/lessons/08_SC_clustering_analysis_integration.html)
-- [Integration - marker id](https://hbctraining.github.io/scRNA-seq/lessons/09_SC_marker_identification_integration.html)
+All steps from QC to integration, clustering, and marker identification can be found in the teaching team repo: https://hbctraining.github.io/scRNA-seq/schedule/.
 
 ### Analysis workflow with Seurat (version 2)
 
