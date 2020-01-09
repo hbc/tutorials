@@ -27,14 +27,11 @@ All steps can be found in the teaching team repo: https://hbctraining.github.io/
 
 
 ### Downstream analyses
-- Differential expression analysis with DESeq2
-  - Pseudobulk - see Meeta
-- Differential expression analysis with EdgeR
-  - Pseudobulk - see Meeta
-- Differential expression analysis with MAST - see Victor
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
+- Differential expression analysis
+  - Pseudobulk with EdgeR - see Meeta/Victor/Rory
+  - Using MAST - see Victor
 - Trajectory analysis
-  - [Monocle](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/Monocle.md) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/)) - needs some work
   - Slingshot - see Rory
 - Power analysis (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/))
   - [Deprecated] Preparation of data for DE analysis with DESeq2 (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_prep_for_DESeq2_analysis.Rmd))
