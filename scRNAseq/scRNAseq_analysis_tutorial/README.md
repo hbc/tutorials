@@ -23,10 +23,9 @@ All steps from QC to integration, clustering, and marker identification can be f
 ### Downstream analyses
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
 - Differential expression analysis
-  - Pseudobulk with EdgeR - see Meeta/Victor/Rory
-  - Using MAST - see Victor
+  - [Pseudobulk with DESeq2]() - coming soon (see Mary
 - Trajectory analysis
-  - Slingshot - see Rory
+  - Slingshot - see Rory/Mary
 - Power analysis 
   - [Current] Associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/)
   - [Deprecated] Preparation of data for DE analysis with DESeq2 (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_prep_for_DESeq2_analysis.Rmd)) - Needs to be changed to pseudobulk analysis
