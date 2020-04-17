@@ -13,13 +13,6 @@ This repository contains tutorials for how to perform each part of a single-cell
 ### Analysis workflow with Seurat (version 3)
 All steps from QC to integration, clustering, and marker identification can be found in the teaching team repo: https://hbctraining.github.io/scRNA-seq/schedule/.
 
-### Analysis workflow with Seurat (version 2)
-
-- [Quality control analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_quality_control_analysis.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_QC_template.Rmd))
-- [Clustering analysis](https://hbctraining.github.io/scRNA-seq/lessons/05_SC_clustering_cells.html)
-- [Marker identification analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_marker_identification.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_marker_identification_template.Rmd))
-
-
 ### Downstream analyses
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
 - Differential expression analysis
@@ -30,6 +23,14 @@ All steps from QC to integration, clustering, and marker identification can be f
   - [Current] Associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/)
   - [Deprecated] Preparation of data for DE analysis with DESeq2 (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_prep_for_DESeq2_analysis.Rmd)) - Needs to be changed to pseudobulk analysis
   - [Deprecated] DE analysis report (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_DESeq2_analysis_report_template.Rmd)) - Needs to be changed to pseudobulk analysis
+
+## Past analysis workflows
+
+### Analysis workflow with Seurat (version 2)
+
+- [Quality control analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_quality_control_analysis.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_QC_template.Rmd))
+- [Clustering analysis](https://hbctraining.github.io/scRNA-seq/lessons/05_SC_clustering_cells.html)
+- [Marker identification analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_marker_identification.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_marker_identification_template.Rmd))
 
 ### Analysis workflow with bcbioSingleCell [last update: 2017]
 
