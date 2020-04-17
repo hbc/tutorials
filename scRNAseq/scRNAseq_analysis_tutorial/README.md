@@ -11,21 +11,32 @@ This repository contains tutorials for how to perform each part of a single-cell
 - [R on O2](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/R_set-up.md)
 
 ### Analysis workflow with Seurat (version 3)
-All steps from QC to integration, clustering, and marker identification can be found in the teaching team repo: https://hbctraining.github.io/scRNA-seq/schedule/.
+All steps from QC to integration, clustering, and marker identification can be found in the teaching team repo: https://hbctraining.github.io/scRNA-seq/schedule/. The hands-on lessons from the workshop can be found below:
+
+- [Generation of count matrix](https://hbctraining.github.io/scRNA-seq/lessons/02_SC_generation_of_count_matrix.html)
+- [Quality control set-up](https://hbctraining.github.io/scRNA-seq/lessons/03_SC_quality_control-setup.html)
+- [Quality control](https://hbctraining.github.io/scRNA-seq/lessons/04_SC_quality_control.html)
+- [Normalization and Integration](https://hbctraining.github.io/scRNA-seq/lessons/06_SC_SCT_and_integration.html)
+- [Clustering](https://hbctraining.github.io/scRNA-seq/lessons/07_SC_clustering_cells_SCT.html)
+- [Clustering QC](https://hbctraining.github.io/scRNA-seq/lessons/08_SC_clustering_quality_control.html)
+- [Marker Identification](https://hbctraining.github.io/scRNA-seq/lessons/09_merged_SC_marker_identification.html)
 
 ### Downstream analyses
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
 - Differential expression analysis
-  - [Pseudobulk with DESeq2]() - coming soon (see Mary
+  - [Pseudobulk with DESeq2]() - coming soon (see Mary)
 - Trajectory analysis
   - Slingshot - see Rory/Mary
 - Power analysis 
   - [Current] Associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/)
-  - [Deprecated] Preparation of data for DE analysis with DESeq2 (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_prep_for_DESeq2_analysis.Rmd)) - Needs to be changed to pseudobulk analysis
-  - [Deprecated] DE analysis report (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_DESeq2_analysis_report_template.Rmd)) - Needs to be changed to pseudobulk analysis
 
 ## Past analysis workflows
 
+### Power analysis prior to pseudobulk technique
+
+- [Deprecated] Preparation of data for DE analysis with DESeq2 (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_prep_for_DESeq2_analysis.Rmd)) - Needs to be changed to pseudobulk analysis
+- [Deprecated] DE analysis report (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_DESeq2_analysis_report_template.Rmd)) - Needs to be changed to pseudobulk analysis
+  
 ### Analysis workflow with Seurat (version 2)
 
 - [Quality control analysis](https://hbctraining.github.io/In-depth-NGS-Data-Analysis-Course/sessionIV/lessons/SC_quality_control_analysis.html) (associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/sc_QC_template.Rmd))
