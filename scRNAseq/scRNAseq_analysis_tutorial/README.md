@@ -30,7 +30,7 @@ All steps from QC to integration, clustering, and marker identification can be f
 - Power analysis 
   - [Current] Associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/)
 
-## Past analysis workflows
+## Past analysis workflows (deprecated)
 
 ### Power analysis prior to pseudobulk technique
 
