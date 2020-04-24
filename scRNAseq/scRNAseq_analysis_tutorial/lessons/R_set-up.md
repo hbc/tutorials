@@ -33,7 +33,7 @@ R_MAX_NUM_DLLS=200
 Now to use R we need to load the required modules for our analysis:
 
 ```r
-module load gcc/6.2.0 R/3.5.1 hdf5/1.10.1
+module load gcc/6.2.0 R/3.5.1
 ```
 
 > Be sure to match the module version of R to the library specified in the `~/.Renviron` file.
