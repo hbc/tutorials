@@ -23,8 +23,7 @@ All steps from QC to integration, clustering, and marker identification can be f
 
 ### Downstream analyses
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
-- Differential expression analysis
-  - [Pseudobulk with DESeq2](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html)
+- [Differential expression analysis - pseudobulk method with DESeq2](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html)
 - Trajectory analysis
   - Slingshot - see Rory/Mary
 - Power analysis 
