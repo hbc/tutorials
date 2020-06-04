@@ -26,7 +26,7 @@ All steps from QC to integration, clustering, and marker identification can be f
 - [Differential expression analysis - pseudobulk method with DESeq2](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html)
 - Trajectory analysis: Slingshot
   - [Analysis/benchmarking Rmd report](https://github.com/hbc/hbc_scrnaseq_tseng_10x_brown_fat_mouse_hbc03764/tree/master/2019_09_tseng_multisample_analysis/analysis_reports/slingshot)
-  - [R script]()
+  - [R script using Seurat clusters and UMAP dim reduction]()
 - Power analysis 
   - [Current] Associated `.Rmd` template available [here](https://github.com/hbc/tutorials/blob/master/scRNAseq/templates/)
 
