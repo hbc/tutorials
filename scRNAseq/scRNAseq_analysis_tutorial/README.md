@@ -24,6 +24,7 @@ All steps from QC to integration, clustering, and marker identification can be f
 ### Downstream analyses
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
 - [Differential expression analysis - pseudobulk method with DESeq2](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html)
+- [Velocity analysis]()
 - Trajectory analysis: Slingshot
   - [Analysis/benchmarking Rmd report](https://github.com/hbc/hbc_scrnaseq_tseng_10x_brown_fat_mouse_hbc03764/blob/master/2019_09_tseng_multisample_analysis/analysis_reports/slingshot/tseng_slingshot_comprehensive_report.tar.gz)
   - [R script using Seurat clusters and UMAP dim reduction](https://github.com/hbc/hbc_scrnaseq_tseng_10x_brown_fat_mouse_hbc03764/blob/master/2019_09_tseng_multisample_analysis/analysis_reports/slingshot/VSM_only_slingshot_to_adipo24_UMAP.R)
