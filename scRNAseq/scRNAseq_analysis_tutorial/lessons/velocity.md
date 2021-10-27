@@ -48,7 +48,7 @@
   #     ds.add_loom(fn, batch_size=1000)
   ```
   
-3. Perform all QC, normalization and clustering using Seurat as described at (http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html)[http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html]. 
+3. Perform all QC, normalization and clustering using Seurat as described at [http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html](http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html). 
 
   ```r
   # library(devtools)
@@ -73,7 +73,7 @@
   Convert("mouseBM.h5Seurat", dest = "h5ad")
   ```
   
-4. Use scVelo in python to construct velocity estimates and trajectories and continue following (http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html)[http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html] and consulting (scVelo documentation)[https://scvelo.readthedocs.io/VelocityBasics]
+4. Use scVelo in python to construct velocity estimates and trajectories and continue following [http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html](http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html) and consulting [scVelo documentation](https://scvelo.readthedocs.io/VelocityBasics)
 
   ```python
   import scvelo as scv
