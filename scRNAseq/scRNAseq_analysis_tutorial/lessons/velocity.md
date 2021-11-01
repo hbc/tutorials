@@ -1,5 +1,7 @@
 # Velocity analysis using velocyto, Seurat and scVelo
 
+To run analysis in a Jupyter notebook on O2, please follow the [available instructions](https://github.com/hbc/knowledgebase/blob/master/rc/jupyter_notebooks.md)
+
 1. Generate loom files containing layers for spliced and unspliced reads using Velocyto.
 
   ```
