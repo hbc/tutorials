@@ -38,4 +38,7 @@ library(loomR)
 
 crtl_sub_loom <- subset(ctrl_loom_merged, m = ctrl_cell_ids, n = NULL, filename = NULL,
   chunk.size = 1000, overwrite = FALSE, display.progress = TRUE)
+  
+ldat <- ReadVelocity(file = "path_to_ctrl.loom")
+bm <- as.Seurat(x = ldat)
 
