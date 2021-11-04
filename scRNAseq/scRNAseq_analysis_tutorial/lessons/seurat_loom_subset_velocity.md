@@ -14,6 +14,8 @@ obj.list <- SplitObject(seurat,
 # Extract separate objects and save associated cell IDs
 ctrl <- obj.list[["ctrl"]]
 ctrl_cell_ids <- colnames(ctrl)
+cre_cell_ids_base <- cre_cell_ids %>% str_split(pattern = "-", simplify = TRUE) %>% .[ , 1]
+
 
 DimPlot(object = ctrl,
         reduction = "umap",
@@ -45,7 +47,7 @@ library(loomR)
 
 ctrl_loom_merged <- ReadVelocity(file = "path_to_ctrl.loom")
 
-crtl_sub_loom <- subset(ctrl_loom_merged, m = ctrl_cell_ids, n = NULL, filename = NULL,
+crtl_sub_loom <- subset.loom(ctrl_loom_merged, m = ctrl_cell_ids, n = NULL, filename = NULL,
   chunk.size = 1000, overwrite = FALSE, display.progress = TRUE)
   
 ctrl_seurat <- as.Seurat(x = crtl_sub_loom)
