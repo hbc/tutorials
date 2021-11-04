@@ -45,10 +45,30 @@ library(SeuratDisk)
 library(SeuratWrappers)
 library(loomR)
 
-ctrl_loom_merged <- ReadVelocity(file = "path_to_ctrl.loom")
+### Load filtered Seurat object and loom file
+seurat_object <- readRDS('/Location/of/seurat_object.rds')
+ldat <- ReadVelocity(file = "/Location/of/loom_file.loom")
 
-crtl_sub_loom <- subset.loom(ctrl_loom_merged, m = ctrl_cell_ids, n = NULL, filename = NULL,
-  chunk.size = 1000, overwrite = FALSE, display.progress = TRUE)
+for (i in names(x = ldat)) {
+  ### Store assay in a new variable
+  assay <- ldat[[i]]
   
-ctrl_seurat <- as.Seurat(x = crtl_sub_loom)
+  ### Rename cell names in loom file to match cell names in Seurat object
+  
+  colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] %>% str_replace("x$", "-1_1")
+  colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] %>% str_replace("x$", "-1_2")
+  colnames(assay) <- gsub('Part of cell name to change', 'Changed part', colnames(assay))
+  colnames(assay) <- gsub('A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2:', '', colnames(assay))
+  colnames(assay) <- gsub('A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2:', '', colnames(assay))
+  
+  ### Subset to filtered cells in Seurat object
+  assay <- assay[,colnames(seurat_object)]
+  
+  ### Add assay to Seurat object
+  seurat_object[[i]] <- CreateAssayObject(counts = assay)
+}
+
+DefaultAssay(seurat_object) <- "RNA"
+SaveH5Seurat(seurat_object, filename = "cre.h5Seurat")
+Convert("cre.h5Seurat", dest = "h5ad")
 
