@@ -40,7 +40,7 @@
   import cython
   import numba
   import matplotlib
-  import scikit-learn
+  import 
   import click
   
   # files = ["path_to_file1.loom", "path_to_file2.loom"]
