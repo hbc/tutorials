@@ -33,12 +33,20 @@ DimPlot(object = ko,
 # Use devtools to install hdf5r and loomR from GitHub
 # devtools::install_github(repo = "hhoeflin/hdf5r")
 # devtools::install_github(repo = "mojaveazure/loomR"
+# library(devtools)
+# install_github("velocyto-team/velocyto.R")   
+# remotes::install_github('satijalab/seurat-wrappers')
+# remotes::install_github("mojaveazure/seurat-disk")
 
+library(Seurat)
+library(SeuratDisk)
+library(SeuratWrappers)
 library(loomR)
+
+ctrl_loom_merged <- ReadVelocity(file = "path_to_ctrl.loom")
 
 crtl_sub_loom <- subset(ctrl_loom_merged, m = ctrl_cell_ids, n = NULL, filename = NULL,
   chunk.size = 1000, overwrite = FALSE, display.progress = TRUE)
   
-ldat <- ReadVelocity(file = "path_to_ctrl.loom")
-bm <- as.Seurat(x = ldat)
+ctrl_seurat <- as.Seurat(x = crtl_sub_loom)
 
