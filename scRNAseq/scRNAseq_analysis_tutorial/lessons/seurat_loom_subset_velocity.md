@@ -1,6 +1,20 @@
 # Subset loom file to cells of interest
 
 ```r
+# Use devtools to install hdf5r and loomR from GitHub
+# devtools::install_github(repo = "hhoeflin/hdf5r")
+# devtools::install_github(repo = "mojaveazure/loomR"
+# library(devtools)
+# install_github("velocyto-team/velocyto.R")   
+# remotes::install_github('satijalab/seurat-wrappers')
+# remotes::install_github("mojaveazure/seurat-disk")
+
+library(Seurat)
+library(SeuratDisk)
+library(SeuratWrappers)
+library(loomR)
+
+
 # Get loom data
 ldat <- ReadVelocity(file = "data/merged_loom_files/all_merged.loom")
 
@@ -45,11 +59,20 @@ bm@reductions[["umap"]] <- seurat_object@reductions[["umap"]]
 bm@assays$integrated <- seurat_object@assays$integrated
 bm@assays$SCT <- seurat_object@assays$SCT
 
-
-# Split into individual and merged objects
-
 # Save object and convert to h5ad format for scvelo
 
+DefaultAssay(bm) <- "RNA"
+SaveH5Seurat(bm, filename = "all_samples.h5Seurat")
+Convert("all_samples.h5Seurat", dest = "h5ad")
+
+
+# Split into individual objects
+bm_cre <- subset(bm, subset = sample_simple == "re")
+DefaultAssay(bm_cre) <- "RNA"
+SaveH5Seurat(bm_cre, filename = "cre_samples.h5Seurat")
+Convert("cre_samples.h5Seurat", dest = "h5ad")
+
+bm_ko <- subset(bm, subset = sample_simple == "KO")
 DefaultAssay(bm) <- "RNA"
 SaveH5Seurat(bm, filename = "all_samples.h5Seurat")
 Convert("all_samples.h5Seurat", dest = "h5ad")
@@ -87,45 +110,4 @@ DimPlot(object = ko,
         label = TRUE) + NoLegend()
 ```
 
-3. Bring in loom files for ctrl and ko samples
-
-```
-# Use devtools to install hdf5r and loomR from GitHub
-# devtools::install_github(repo = "hhoeflin/hdf5r")
-# devtools::install_github(repo = "mojaveazure/loomR"
-# library(devtools)
-# install_github("velocyto-team/velocyto.R")   
-# remotes::install_github('satijalab/seurat-wrappers')
-# remotes::install_github("mojaveazure/seurat-disk")
-
-library(Seurat)
-library(SeuratDisk)
-library(SeuratWrappers)
-library(loomR)
-
-### Load filtered Seurat object and loom file
-seurat_object <- readRDS('/Location/of/seurat_object.rds')
-ldat <- ReadVelocity(file = "/Location/of/loom_file.loom")
-
-for (i in names(x = ldat)) {
-  ### Store assay in a new variable
-  assay <- ldat[[i]]
-  
-  ### Rename cell names in loom file to match cell names in Seurat object
-  
-  colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] %>% str_replace("x$", "-1_1")
-  colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] %>% str_replace("x$", "-1_2")
-  colnames(assay) <- gsub('A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2:', '', colnames(assay))
-  colnames(assay) <- gsub('A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2:', '', colnames(assay))
-  
-  ### Subset to filtered cells in Seurat object
-  assay <- assay[,colnames(seurat_object)]
-  
-  ### Add assay to Seurat object
-  seurat_object[[i]] <- CreateAssayObject(counts = assay)
-}
-
-DefaultAssay(seurat_object) <- "RNA"
-SaveH5Seurat(seurat_object, filename = "cre.h5Seurat")
-Convert("cre.h5Seurat", dest = "h5ad")
 
