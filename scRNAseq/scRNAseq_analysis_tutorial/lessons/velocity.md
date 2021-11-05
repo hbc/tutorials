@@ -30,27 +30,27 @@
 
 2. In python merge any loom files desired
 
-  ```python
-  #python3
-  import velocyto as vcy
-  import loompy
-  import scvelo as scv
-  import numpy as np
-  import h5py
-  import scipy
-  import cython
-  import numba
-  import matplotlib
-  import 
-  import click
-  
-  # files = ["path_to_file1.loom", "path_to_file2.loom"]
-  files = ["../final/cellranger_6.0.0/count/expect_cells/A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2/velocyto/A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2.loom", "../final/cellranger_6.0.0/count/expect_cells/A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2/velocyto/A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2.loom", "../final/cellranger_6.0.0/count/expect_cells/A3_CKDL210009741-1a-SI_TT_B2_HC2W5DSX2/velocyto/A3_CKDL210009741-1a-SI_TT_B2_HC2W5DSX2.loom", "../final/cellranger_6.0.0/count/expect_cells/A4_CKDL210009742-1a-SI_TT_B7_HC2W5DSX2/velocyto/A4_CKDL210009742-1a-SI_TT_B7_HC2W5DSX2.loom"]
-
-  ds = loompy.connect("data/merged_loom_files/all_merged.loom")
-  for fn in files[1:]:
-    ds.add_loom(fn, batch_size=1000)
-  ```
+      ```python
+      #python3
+      import velocyto as vcy
+      import loompy
+      import scvelo as scv
+      import numpy as np
+      import h5py
+      import scipy
+      import cython
+      import numba
+      import matplotlib
+      import 
+      import click
+      
+      # files = ["path_to_file1.loom", "path_to_file2.loom"]
+      files = ["../final/cellranger_6.0.0/count/expect_cells/A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2/velocyto/A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2.loom", "../final/cellranger_6.0.0/count/expect_cells/A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2/velocyto/A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2.loom", "../final/cellranger_6.0.0/count/expect_cells/A3_CKDL210009741-1a-SI_TT_B2_HC2W5DSX2/velocyto/A3_CKDL210009741-1a-SI_TT_B2_HC2W5DSX2.loom", "../final/cellranger_6.0.0/count/expect_cells/A4_CKDL210009742-1a-SI_TT_B7_HC2W5DSX2/velocyto/A4_CKDL210009742-1a-SI_TT_B7_HC2W5DSX2.loom"]
+    
+      ds = loompy.connect("data/merged_loom_files/all_merged.loom")
+      for fn in files[1:]:
+        ds.add_loom(fn, batch_size=1000)
+      ```
   
 3. Perform all QC, normalization and clustering using Seurat as described at [http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html](http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html). 
 
