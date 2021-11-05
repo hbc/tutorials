@@ -54,6 +54,8 @@
   
 3. Perform all QC, normalization and clustering using Seurat as described at [http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html](http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html). 
 
+  If you cannot do your own analyses and must use the data given to you by the client, then documentation for merging/subsetting loom files with their Seurat data/clusters is [available](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/seurat_loom_subset_velocity.md).
+
   ```r
   deactivate velocyto
   module load gcc/6.2.0 R/4.1.1
