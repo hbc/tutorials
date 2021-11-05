@@ -72,10 +72,10 @@ DefaultAssay(bm_cre) <- "RNA"
 SaveH5Seurat(bm_cre, filename = "cre_samples.h5Seurat")
 Convert("cre_samples.h5Seurat", dest = "h5ad")
 
-bm_ko <- subset(bm, subset = sample_simple == "KO")
-DefaultAssay(bm) <- "RNA"
-SaveH5Seurat(bm, filename = "all_samples.h5Seurat")
-Convert("all_samples.h5Seurat", dest = "h5ad")
+bm_ko <- subset(bm_ko, subset = sample_simple == "KO")
+DefaultAssay(bm_ko) <- "RNA"
+SaveH5Seurat(bm_ko, filename = "ko_samples.h5Seurat")
+Convert("ko_samples.h5Seurat", dest = "h5ad")
 
 ```
 
