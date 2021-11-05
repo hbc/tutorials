@@ -79,35 +79,4 @@ Convert("all_samples.h5Seurat", dest = "h5ad")
 
 ```
 
-#################
-
-1. Split Seurat file into separate groups if velocity analysis is split by group
-
-```r
-# Split Seurat object
-obj.list <- SplitObject(seurat, 
-                        split.by = "sample_simple")               
-```
-
-2. Save as separate objects
-
-```r
-# Extract separate objects and save associated cell IDs
-ctrl <- obj.list[["ctrl"]]
-ctrl_cell_ids <- colnames(ctrl)
-cre_cell_ids_base <- cre_cell_ids %>% str_split(pattern = "-", simplify = TRUE) %>% .[ , 1]
-
-
-DimPlot(object = ctrl,
-        reduction = "umap",
-        label = TRUE) + NoLegend()
-
-ko <- obj.list[["ko"]]
-ko_cell_ids <- colnames(ko)
-
-DimPlot(object = ko,
-        reduction = "umap",
-        label = TRUE) + NoLegend()
-```
-
 
