@@ -54,33 +54,33 @@
   
 3. Perform all QC, normalization and clustering using Seurat as described at [http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html](http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html). 
 
-  If you cannot do your own analyses and must use the data given to you by the client, then documentation for merging/subsetting loom files with their Seurat data/clusters is [available](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/seurat_loom_subset_velocity.md).
-
-  ```r
-  deactivate velocyto
-  module load gcc/6.2.0 R/4.1.1
+    If you cannot do your own analyses and must use the data given to you by the client, then documentation for merging/subsetting loom files with their Seurat data/clusters is [available](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/seurat_loom_subset_velocity.md).
   
-  # library(devtools)
-  # install_github("velocyto-team/velocyto.R")   
-  # remotes::install_github('satijalab/seurat-wrappers')
-  # remotes::install_github("mojaveazure/seurat-disk")
-  
-  library(Seurat)
-  library(SeuratDisk)
-  library(SeuratWrappers)
-  
-  ldat <- ReadVelocity(file = "path_to_file.loom")
-  bm <- as.Seurat(x = ldat)
-  bm[["RNA"]] <- bm[["spliced"]]
-  bm <- SCTransform(bm)
-  bm <- RunPCA(bm)
-  bm <- RunUMAP(bm, dims = 1:30)
-  bm <- FindNeighbors(bm, dims = 1:30)
-  bm <- FindClusters(bm)
-  DefaultAssay(bm) <- "RNA"
-  SaveH5Seurat(bm, filename = "mouseBM.h5Seurat")
-  Convert("mouseBM.h5Seurat", dest = "h5ad")
-  ```
+    ```r
+    deactivate velocyto
+    module load gcc/6.2.0 R/4.1.1
+    
+    # library(devtools)
+    # install_github("velocyto-team/velocyto.R")   
+    # remotes::install_github('satijalab/seurat-wrappers')
+    # remotes::install_github("mojaveazure/seurat-disk")
+    
+    library(Seurat)
+    library(SeuratDisk)
+    library(SeuratWrappers)
+    
+    ldat <- ReadVelocity(file = "path_to_file.loom")
+    bm <- as.Seurat(x = ldat)
+    bm[["RNA"]] <- bm[["spliced"]]
+    bm <- SCTransform(bm)
+    bm <- RunPCA(bm)
+    bm <- RunUMAP(bm, dims = 1:30)
+    bm <- FindNeighbors(bm, dims = 1:30)
+    bm <- FindClusters(bm)
+    DefaultAssay(bm) <- "RNA"
+    SaveH5Seurat(bm, filename = "mouseBM.h5Seurat")
+    Convert("mouseBM.h5Seurat", dest = "h5ad")
+    ```
   
 4. Use scVelo in python to construct velocity estimates and trajectories and continue following [http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html](http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html) and consulting [scVelo documentation](https://scvelo.readthedocs.io/VelocityBasics)
 
