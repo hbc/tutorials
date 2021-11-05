@@ -16,23 +16,21 @@ all_cells <- Cells(bm)
 all_cells[str_detect(all_cells, pattern = "A1_")] <- all_cells[str_detect(all_cells, pattern = "A1_")] %>% str_replace("x$", "-1_1")
 all_cells[str_detect(all_cells, pattern = "A2_")] <- all_cells[str_detect(all_cells, pattern = "A2_")] %>% str_replace("x$", "-1_2")
 all_cells[str_detect(all_cells, pattern = "A3_")] <- all_cells[str_detect(all_cells, pattern = "A3_")] %>% str_replace("x$", "-1_3")
-all_cells[str_detect(all_cells, pattern = "A4_")] <- all_cells[str_detect(all_cells, pattern = "A1_")] %>% str_replace("x$", "-1_4")
+all_cells[str_detect(all_cells, pattern = "A4_")] <- all_cells[str_detect(all_cells, pattern = "A4_")] %>% str_replace("x$", "-1_4")
+
+all_cells <- gsub('A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2:', '', all_cells)
+all_cells <- gsub('A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2:', '', all_cells)
+all_cells <- gsub('A3_CKDL210009741-1a-SI_TT_B2_HC2W5DSX2:', '', all_cells)
+all_cells <- gsub('A4_CKDL210009742-1a-SI_TT_B7_HC2W5DSX2:', '', all_cells)
 
 new_names <- all_cells
-RenameCells(bm, new.names = new_names)
+bm <- RenameCells(bm, new.names = new_names)
 
 
 
 for (i in names(x = bm)) {
   ### Store assay in a new variable
   assay <- bm[[i]]
-  
-  ### Rename cell names in loom file to match cell names in Seurat object
-  
-  colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] %>% str_replace("x$", "-1_1")
-  colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] %>% str_replace("x$", "-1_2")
-  colnames(assay) <- gsub('A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2:', '', colnames(assay))
-  colnames(assay) <- gsub('A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2:', '', colnames(assay))
   
   ### Subset to filtered cells in Seurat object
   assay <- assay[,colnames(seurat_object)]
