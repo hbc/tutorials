@@ -53,6 +53,9 @@
 3. Perform all QC, normalization and clustering using Seurat as described at [http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html](http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/scvelo.html). 
 
   ```r
+  deactivate velocyto
+  module load gcc/6.2.0 R/4.1.1
+  
   # library(devtools)
   # install_github("velocyto-team/velocyto.R")   
   # remotes::install_github('satijalab/seurat-wrappers')
