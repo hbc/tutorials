@@ -1,5 +1,56 @@
 # Subset loom file to cells of interest
 
+```r
+# Get loom data
+ldat <- ReadVelocity(file = "data/merged_loom_files/all_merged.loom")
+
+# Turn loom to seurat
+bm <- as.Seurat(x = ldat)
+bm[["RNA"]] <- bm[["spliced"]]
+
+# Bring in Seurat with known clusters
+seurat_object <- readRDS('data/seurat_combined_sct_umap_FBS.rds')
+
+# Change cell ids of loom seurat to match cell ids in seurat with known clusters
+all_cells <- Cells(bm)
+all_cells[str_detect(all_cells, pattern = "A1_")] <- all_cells[str_detect(all_cells, pattern = "A1_")] %>% str_replace("x$", "-1_1")
+all_cells[str_detect(all_cells, pattern = "A2_")] <- all_cells[str_detect(all_cells, pattern = "A2_")] %>% str_replace("x$", "-1_2")
+all_cells[str_detect(all_cells, pattern = "A3_")] <- all_cells[str_detect(all_cells, pattern = "A3_")] %>% str_replace("x$", "-1_3")
+all_cells[str_detect(all_cells, pattern = "A4_")] <- all_cells[str_detect(all_cells, pattern = "A1_")] %>% str_replace("x$", "-1_4")
+
+new_names <- all_cells
+RenameCells(bm, new.names = new_names)
+
+
+
+for (i in names(x = bm)) {
+  ### Store assay in a new variable
+  assay <- bm[[i]]
+  
+  ### Rename cell names in loom file to match cell names in Seurat object
+  
+  colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] %>% str_replace("x$", "-1_1")
+  colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] %>% str_replace("x$", "-1_2")
+  colnames(assay) <- gsub('A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2:', '', colnames(assay))
+  colnames(assay) <- gsub('A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2:', '', colnames(assay))
+  
+  ### Subset to filtered cells in Seurat object
+  assay <- assay[,colnames(seurat_object)]
+  
+  ### Add assay to Seurat object
+  seurat_object[[i]] <- CreateAssayObject(counts = assay)
+}
+
+# Add  cluster ID to metadata file for each cell
+
+# Split into individual and merged objects
+
+# Save object and convert to h5ad format for scvelo
+
+```
+
+#################
+
 1. Split Seurat file into separate groups if velocity analysis is split by group
 
 ```r
@@ -57,7 +108,6 @@ for (i in names(x = ldat)) {
   
   colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A1_")] %>% str_replace("x$", "-1_1")
   colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] <- colnames(assay)[str_detect(colnames(assay), pattern = "A2_")] %>% str_replace("x$", "-1_2")
-  colnames(assay) <- gsub('Part of cell name to change', 'Changed part', colnames(assay))
   colnames(assay) <- gsub('A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2:', '', colnames(assay))
   colnames(assay) <- gsub('A2_CKDL210009740-1a-SI_TT_B6_HC2W5DSX2:', '', colnames(assay))
   
