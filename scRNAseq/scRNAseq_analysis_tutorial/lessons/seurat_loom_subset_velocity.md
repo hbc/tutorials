@@ -26,24 +26,33 @@ all_cells <- gsub('A4_CKDL210009742-1a-SI_TT_B7_HC2W5DSX2:', '', all_cells)
 new_names <- all_cells
 bm <- RenameCells(bm, new.names = new_names)
 
+# Get names of seurat_object
+DefaultAssay(seurat_object) <- "RNA"
 
+sub_genes <- rownames(seurat_object)
+sub_cells <- colnames(seurat_object)
 
-for (i in names(x = bm)) {
-  ### Store assay in a new variable
-  assay <- bm[[i]]
-  
-  ### Subset to filtered cells in Seurat object
-  assay <- assay[,colnames(seurat_object)]
-  
-  ### Add assay to Seurat object
-  seurat_object[[i]] <- CreateAssayObject(counts = assay)
-}
+# Subset loom seurat
+bm <- subset(bm, features = sub_genes, cells = sub_cells)
 
 # Add  cluster ID to metadata file for each cell
+bm <- AddMetaData(bm, seurat_object@meta.data[, c("DE_group", "sample_simple", "seurat_clusters")])
+
+# Add all slots to object
+bm@reductions[["pca"]] <- seurat_object@reductions[["pca"]]
+bm@reductions[["umap"]] <- seurat_object@reductions[["umap"]]
+
+bm@assays$integrated <- seurat_object@assays$integrated
+bm@assays$SCT <- seurat_object@assays$SCT
+
 
 # Split into individual and merged objects
 
 # Save object and convert to h5ad format for scvelo
+
+DefaultAssay(bm) <- "RNA"
+SaveH5Seurat(bm, filename = "all_samples.h5Seurat")
+Convert("all_samples.h5Seurat", dest = "h5ad")
 
 ```
 
