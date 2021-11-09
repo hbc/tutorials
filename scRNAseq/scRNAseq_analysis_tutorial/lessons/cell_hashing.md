@@ -64,11 +64,11 @@ The next step is to perform the alignment and counting of the reads. The `cellra
 
   Upon asking, the client returned the following, which was sufficient for proceeding:
   
-  > - WT
+  > **WT**
   > - [TotalSeq™-B0301 anti-mouse Hashtag 1 Antibody](https://www.biolegend.com/en-us/search-results/totalseq-b0301-anti-mouse-hashtag-1-antibody-17771)
   > - Barcode Sequence: ACCCACCAGTAAGAC
   > 
-  > - KO
+  > **KO**
   > - [TotalSeq™-B0302 anti-mouse Hashtag 2 Antibody](https://www.biolegend.com/en-us/search-results/totalseq-b0302-anti-mouse-hashtag-2-antibody-17772)
   > - Barcode Sequence: GGTCGAGAGCATTCA
   
