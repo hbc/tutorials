@@ -93,7 +93,7 @@ The next step is to perform the alignment and counting of the reads. The `cellra
 Now to run the `cellranger count` command, we can include this information:
 
   ```
-  cellranger count --id=name_for_output_folder_in_feature_ref.csv\
+  cellranger count --id=name_for_output_folder\
                    --libraries=library.csv \
                    --transcriptome=/n/shared_db/mm10/uk/cellranger/6.0.0/6.0.0/refdata-gex-mm10-2020-A/ \ # change for experiment
                    --feature-ref=feature_ref.csv \
