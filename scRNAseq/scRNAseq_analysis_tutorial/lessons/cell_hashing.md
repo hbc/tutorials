@@ -75,7 +75,7 @@ The next step is to perform the alignment and counting of the reads. The `cellra
   > Barcode Sequence: GGTCGAGAGCATTCA
   
   To construct the feature reference file, the client's barcoding information needs to be provided in a specific format. The `feature_ref.csv` file should have the following columns:
-    - `id`: name for the output folder
+    - `id`: unique ID corresponding to feature
     - `name`: name for feature
     - `read`: which read the antibody capture barcode is present within
     - `pattern`: the pattern used to parse the barcode
