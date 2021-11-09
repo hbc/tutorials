@@ -61,8 +61,9 @@ The next step is to perform the alignment and counting of the reads. The `cellra
   - Are the hashing antibodies from Biolegend? If so, then the parsing information can be found in the [documention](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/feature-bc-analysis#feature-ref)
   - What antibodies did you use and what are their barcodes?
   - What are the corresponding samples? 
+  - Might also be helpful to ask for the antibody description / documentation
 
-  Upon asking, the client returned the following, which was sufficient for proceeding:
+  Upon asking, the client returned the following, which was helpful for proceeding:
   
   > **WT**
   > - [TotalSeq™-B0301 anti-mouse Hashtag 1 Antibody](https://www.biolegend.com/en-us/search-results/totalseq-b0301-anti-mouse-hashtag-1-antibody-17771)
@@ -71,6 +72,8 @@ The next step is to perform the alignment and counting of the reads. The `cellra
   > **KO**
   > - [TotalSeq™-B0302 anti-mouse Hashtag 2 Antibody](https://www.biolegend.com/en-us/search-results/totalseq-b0302-anti-mouse-hashtag-2-antibody-17772)
   > - Barcode Sequence: GGTCGAGAGCATTCA
+  >
+  > _**Important information from the antibody documentation to note:**  The antibodies are specific against mouse CD45 and MHC class I (of a, b,  d, j, k, s, and u haplotypes) and can be used to label hematopoietic and non-hematopoietic cells in most commonly used mouse strains for multiplex single cell sequencing analysis. CD45 (LCA, T200, or Ly-5) is expressed on all hematopoietic cells except mature erythrocytes and platelets. CD45 plays a key role in TCR and BCR signal transduction. The MHC class I M1/42 antibody reacts with the H-2 MHC class I alloantigens expressed on nucleated cells from mice of the a, b, d, j, k, s, and u haplotypes_ 
   
   To construct the feature reference file, the client's barcoding information needs to be provided in a specific format. The `feature_ref.csv` file should have the following columns:
     - `id`: unique ID corresponding to feature
