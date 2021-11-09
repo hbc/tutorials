@@ -57,3 +57,47 @@ The next step is to perform the alignment and counting of the reads. The `cellra
     cellranger_mkfastq/outs/fastq_path/HGFCGBGXK/, barcode, Antibody Capture
     cellranger_mkfastq/outs/fastq_path/HGFCGBGXK/, gene, Gene Expression
     ```
+- **Feature Reference CSV file**: This file provides information for parsing the antibody capture barcode information for each sample and assigning it to a sample. **You will need to acquire this information from the group preparing the libraries.** The following information is needed:
+  - Are the hashing antibodies from Biolegend? If so, then the parsing information can be found in the [documention](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/feature-bc-analysis#feature-ref)
+  - What antibodies did you use and what are their barcodes?
+  - What are the corresponding samples? 
+
+  Upon asking, the client returned the following, which was sufficient for proceeding:
+  
+  > •WT
+  > TotalSeq™-B0301 anti-mouse Hashtag 1 Antibody
+  > https://www.biolegend.com/en-us/search-results/totalseq-b0301-anti-mouse-hashtag-1-antibody-17771
+  > Barcode Sequence: ACCCACCAGTAAGAC
+  > 
+  > •KO
+  > TotalSeq™-B0302 anti-mouse Hashtag 2 Antibody
+  > https://www.biolegend.com/en-us/search-results/totalseq-b0302-anti-mouse-hashtag-2-antibody-17772
+  > Barcode Sequence: GGTCGAGAGCATTCA
+  
+  To construct the feature reference file, the client's barcoding information needs to be provided in a specific format. The `feature_ref.csv` file should have the following columns:
+    - `id`: name for the output folder
+    - `name`: name for feature
+    - `read`: which read the antibody capture barcode is present within
+    - `pattern`: the pattern used to parse the barcode
+    - `sequence`: the barcode sequence for each sample
+    - `feature_type`: for cell hashing, this should be 'Antibody Capture'
+  
+  An example `feature_ref.csv` file is given below:
+  
+  ```
+  id, name, read, pattern, sequence, feature_type
+  WT, WT_TotalSeqB0301, R2, 5PNNNNNNNNNN(BC)NNNNNNNNN, ACCCACCAGTAAGAC, Antibody Capture
+  KO, KO_TotalSeqB0302, R2,5PNNNNNNNNNN(BC)NNNNNNNNN, GGTCGAGAGCATTCA, Antibody Capture
+  ```
+  
+Now to run the `cellranger count` command, we can include this information:
+
+  ```
+  cellranger count --id=name_for_output_folder_in_feature_ref.csv\
+                   --libraries=library.csv \
+                   --transcriptome=/n/shared_db/mm10/uk/cellranger/6.0.0/6.0.0/refdata-gex-mm10-2020-A/ \ # change for experiment
+                   --feature-ref=feature_ref.csv \
+                   --expect-cells=15000 \ # change for experiment
+                   --localcores 6 \
+                   --localmem 64 
+  ```
