@@ -89,6 +89,7 @@
     adata = scv.read("mouseBM.h5ad")
     adata
     
+    # This may not be the best function to use - normalization procedure not as robust as scTransform
     scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=3000)
     
     scv.pp.moments(adata, n_pcs=30, n_neighbors=30)
