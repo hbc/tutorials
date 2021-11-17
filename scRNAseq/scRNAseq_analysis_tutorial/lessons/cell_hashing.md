@@ -103,4 +103,4 @@ Now to run the `cellranger count` command, we can include this information:
                    --localmem 64 
   ```
 
-**NOTE:** After bringing count matrix into R we roughly follow [this vignette](https://satijalab.org/seurat/articles/hashing_vignette.html).
+> _**NOTE:** After bringing count matrix into R we roughly follow [this vignette](https://satijalab.org/seurat/articles/hashing_vignette.html)._
