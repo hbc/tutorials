@@ -90,4 +90,4 @@
     adata
     ```
     
-    The scVelo code used for a scVelo analysis can be found as a [pdf]() or [Jupyter notebook]().
+    The scVelo code used for a scVelo analysis can be found as a [pdf](https://github.com/hbc/hbc_10x_scRNAseq_Feinberg_Aortic_cells_from_TKO_and_WT_mouse_hbc04205_3/blob/master/velocyto/feinberg_velocity_analysis_KLF10_KO_vs_Cre_all_results/velocity_jupyter_notebook.pdf) or [Jupyter notebook](https://github.com/hbc/hbc_10x_scRNAseq_Feinberg_Aortic_cells_from_TKO_and_WT_mouse_hbc04205_3/blob/master/velocyto/velocity_jupyter_notebook.ipynb).
