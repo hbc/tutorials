@@ -26,7 +26,7 @@ All steps from QC to integration, clustering, and marker identification can be f
 - [Differential expression analysis - pseudobulk method with DESeq2](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html)
 - Velocity analysis
   - [Using Seurat clusters](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/velocity.md)
-  - Using scanpy - follow [Scanpy tutorial](https://scanpy-tutorials.readthedocs.io/en/latest/pbmc3k.html) to generate clusters, then using scVelo should be the same as using Seurat clusters
+  - Using scanpy - follow [Scanpy tutorial](https://scanpy-tutorials.readthedocs.io/en/latest/pbmc3k.html) to generate clusters, then using scVelo should be the same as with Seurat clusters that is [documented here](https://github.com/hbc/hbc_10x_scRNAseq_Feinberg_Aortic_cells_from_TKO_and_WT_mouse_hbc04205_3/blob/master/velocyto/feinberg_velocity_analysis_KLF10_KO_vs_Cre_all_results/velocity_jupyter_notebook.pdf) and in the [scVelo documentation](https://scvelo.readthedocs.io/VelocityBasics).
 - Trajectory analysis: Slingshot
   - [Analysis/benchmarking Rmd report](https://github.com/hbc/hbc_scrnaseq_tseng_10x_brown_fat_mouse_hbc03764/blob/master/2019_09_tseng_multisample_analysis/analysis_reports/slingshot/tseng_slingshot_comprehensive_report.tar.gz)
   - [R script using Seurat clusters and UMAP dim reduction](https://github.com/hbc/hbc_scrnaseq_tseng_10x_brown_fat_mouse_hbc03764/blob/master/2019_09_tseng_multisample_analysis/analysis_reports/slingshot/VSM_only_slingshot_to_adipo24_UMAP.R)
