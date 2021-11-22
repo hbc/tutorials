@@ -90,4 +90,4 @@
     adata
     ```
     
-    The scVelo code used for scVelo analysis can be found [here](https://www.dropbox.com/s/jxlworc6td3mfcy/velocity_jupyter_notebook.pdf?dl=1).
+    The scVelo code used for a scVelo analysis can be found as a [pdf](https://www.dropbox.com/s/jxlworc6td3mfcy/velocity_jupyter_notebook.pdf?dl=1) or [Jupyter notebook](https://www.dropbox.com/s/j3rqwbylyvzv9xz/velocity_jupyter_notebook.ipynb?dl=1).
