@@ -88,26 +88,6 @@
     import scvelo as scv
     adata = scv.read("mouseBM.h5ad")
     adata
-    
-    # This may not be the best function to use - normalization procedure not as robust as scTransform
-    scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=3000)
-    
-    scv.pp.moments(adata, n_pcs=30, n_neighbors=30)
-    
-    scv.tl.velocity(adata)
-    
-    scv.tl.velocity_graph(adata)
-    
-    scv.pl.velocity_embedding_stream(adata, basis="umap", color="seurat_clusters")
-    
-    scv.pl.velocity_embedding(adata, basis="umap", color="seurat_clusters", arrow_length=3, arrow_size=2, dpi=120)
-    
-    scv.tl.recover_dynamics(adata)
-    
-    scv.tl.latent_time(adata)
-    
-    scv.pl.scatter(adata, color="latent_time", color_map="gnuplot")
-    
-    top_genes = adata.var["fit_likelihood"].sort_values(ascending=False).index[:300]
-    scv.pl.heatmap(adata, var_names=top_genes, sortby="latent_time", col_color="seurat_clusters", n_convolve=100)
     ```
+    
+    The scVelo code used for scVelo analysis can be found [here](https://www.dropbox.com/s/jxlworc6td3mfcy/velocity_jupyter_notebook.pdf?dl=1).
