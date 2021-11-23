@@ -25,7 +25,7 @@
     velocyto run10x -m ../data/mm10_rmsk.gtf ../final/cellranger_6.0.0/count/expect_cells/A1_CKDL210009739-1a-SI_TT_B3_HC2W5DSX2/ genes.gtf
     
     # Create merged loom object - start by copying first file in 'files' below, then add another loom file in python below.
-    # cp path_to_file1.loom path_to_file1_2_merged.loom
+    # cp path_to_file1.loom all_merged.loom
     ```
 
 2. In python merge any loom files desired
