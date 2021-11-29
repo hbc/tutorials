@@ -21,7 +21,9 @@ All steps from QC to integration, clustering, and marker identification can be f
 - [Clustering QC](https://hbctraining.github.io/scRNA-seq/lessons/08_SC_clustering_quality_control.html)
 - [Marker Identification](https://hbctraining.github.io/scRNA-seq/lessons/09_merged_SC_marker_identification.html)
 
-### Downstream analyses
+### Downstream and other analyses
+
+- [Cell hashing](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/cell_hashing.md)
 - [Generating data for SPRING](https://github.com/hbc/tutorials/blob/master/scRNAseq/scRNAseq_analysis_tutorial/lessons/SPRING.md)
 - [Differential expression analysis - pseudobulk method with DESeq2](https://hbctraining.github.io/scRNA-seq/lessons/pseudobulk_DESeq2_scrnaseq.html)
 - Velocity analysis
